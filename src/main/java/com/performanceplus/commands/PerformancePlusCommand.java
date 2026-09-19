@@ -2,7 +2,7 @@ package com.performanceplus.commands;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.metrics.ChunkMetricsManager.Metrics;
-import com.performanceplus.util.MessageUtil;
+import com.performanceplus.util.MessageManager;
 import org.bukkit.Chunk;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -11,6 +11,7 @@ import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
 import java.util.List;
+import java.util.Map;
 
 public class PerformancePlusCommand implements CommandExecutor, TabCompleter {
     private final PerformancePlus plugin;
@@ -20,69 +21,76 @@ public class PerformancePlusCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        String prefix = plugin.getConfigManager().getPrefix();
-        if (args.length == 0) { sendStatus(sender, prefix); return true; }
+        MessageManager messages = plugin.getMessageManager();
+        if (args.length == 0) { sendStatus(sender); return true; }
 
         switch (args[0].toLowerCase()) {
-            case "status" -> sendStatus(sender, prefix);
-            case "chunk" -> sendChunkInfo(sender, prefix);
-            case "farms" -> sendFarms(sender, prefix);
+            case "status" -> sendStatus(sender);
+            case "chunk" -> sendChunkInfo(sender);
+            case "farms" -> sendFarms(sender);
             case "reload" -> {
                 if (!sender.hasPermission("performanceplus.admin")) {
-                    MessageUtil.send(sender, prefix, "&cVocê não tem permissão para isso.");
+                    messages.send(sender, "comandos.sem-permissao");
                     return true;
                 }
                 plugin.getConfigManager().reload();
-                MessageUtil.send(sender, prefix, "&aConfiguração recarregada com sucesso.");
+                messages.reload();
+                messages.send(sender, "comandos.config-recarregada");
             }
-            default -> sendHelp(sender, prefix);
+            default -> sendHelp(sender);
         }
         return true;
     }
 
-    private void sendStatus(CommandSender sender, String prefix) {
-        MessageUtil.send(sender, prefix, "&f--- &bPerformancePlus &f---");
-        MessageUtil.send(sender, prefix, "&7TPS: &f" + String.format("%.2f", plugin.getPerformanceMonitor().getTps()));
-        MessageUtil.send(sender, prefix, "&7MSPT: &f" + String.format("%.2f", plugin.getPerformanceMonitor().getMspt()));
-        MessageUtil.send(sender, prefix, "&7Nível de proteção: &f" + plugin.getPerformanceMonitor().getProtectionLevel());
-        MessageUtil.send(sender, prefix, "&7Chunks monitorados: &f" + plugin.getMetricsManager().size());
-        MessageUtil.send(sender, prefix, "&7Chunks sinalizados: &f" + plugin.getFarmController().getFlaggedChunks().size());
+    private void sendStatus(CommandSender sender) {
+        MessageManager m = plugin.getMessageManager();
+        m.send(sender, "comandos.status.titulo");
+        m.send(sender, "comandos.status.tps", Map.of("{tps}", String.format("%.2f", plugin.getPerformanceMonitor().getTps())));
+        m.send(sender, "comandos.status.mspt", Map.of("{mspt}", String.format("%.2f", plugin.getPerformanceMonitor().getMspt())));
+        m.send(sender, "comandos.status.nivel", Map.of("{nivel}", String.valueOf(plugin.getPerformanceMonitor().getProtectionLevel())));
+        m.send(sender, "comandos.status.chunks-monitorados", Map.of("{valor}", String.valueOf(plugin.getMetricsManager().size())));
+        m.send(sender, "comandos.status.chunks-sinalizados", Map.of("{valor}", String.valueOf(plugin.getFarmController().getFlaggedChunks().size())));
     }
 
-    private void sendChunkInfo(CommandSender sender, String prefix) {
+    private void sendChunkInfo(CommandSender sender) {
+        MessageManager m = plugin.getMessageManager();
         if (!(sender instanceof Player player)) {
-            MessageUtil.send(sender, prefix, "&cEste comando só pode ser usado por jogadores.");
+            m.send(sender, "comandos.apenas-jogador");
             return;
         }
         Chunk chunk = player.getLocation().getChunk();
-        Metrics m = plugin.getMetricsManager().get(chunk);
-        MessageUtil.send(sender, prefix, "&f--- &bChunk &f(" + chunk.getX() + ", " + chunk.getZ() + ") &f---");
-        MessageUtil.send(sender, prefix, "&7Mobs: &f" + m.mobs());
-        MessageUtil.send(sender, prefix, "&7Entidades: &f" + m.entities());
-        MessageUtil.send(sender, prefix, "&7Itens: &f" + m.items());
-        MessageUtil.send(sender, prefix, "&7XP: &f" + m.xpOrbs());
-        MessageUtil.send(sender, prefix, "&7Hoppers: &f" + m.hoppers());
-        MessageUtil.send(sender, prefix, "&7Spawners: &f" + m.spawners());
-        MessageUtil.send(sender, prefix, "&7Pistões: &f" + m.pistons());
-        MessageUtil.send(sender, prefix, "&7Observers: &f" + m.observers());
+        Metrics metrics = plugin.getMetricsManager().get(chunk);
+        m.send(sender, "comandos.chunk.titulo", Map.of(
+                "{x}", String.valueOf(chunk.getX()),
+                "{z}", String.valueOf(chunk.getZ())));
+        m.send(sender, "comandos.chunk.mobs", Map.of("{valor}", String.valueOf(metrics.mobs())));
+        m.send(sender, "comandos.chunk.entidades", Map.of("{valor}", String.valueOf(metrics.entities())));
+        m.send(sender, "comandos.chunk.itens", Map.of("{valor}", String.valueOf(metrics.items())));
+        m.send(sender, "comandos.chunk.xp", Map.of("{valor}", String.valueOf(metrics.xpOrbs())));
+        m.send(sender, "comandos.chunk.hoppers", Map.of("{valor}", String.valueOf(metrics.hoppers())));
+        m.send(sender, "comandos.chunk.spawners", Map.of("{valor}", String.valueOf(metrics.spawners())));
+        m.send(sender, "comandos.chunk.pistoes", Map.of("{valor}", String.valueOf(metrics.pistons())));
+        m.send(sender, "comandos.chunk.observers", Map.of("{valor}", String.valueOf(metrics.observers())));
     }
 
-    private void sendFarms(CommandSender sender, String prefix) {
+    private void sendFarms(CommandSender sender) {
+        MessageManager m = plugin.getMessageManager();
         if (plugin.getFarmController().getFlaggedChunks().isEmpty()) {
-            MessageUtil.send(sender, prefix, "&aNenhum chunk de alta concentração detectado.");
+            m.send(sender, "comandos.farms.nenhum");
             return;
         }
-        MessageUtil.send(sender, prefix, "&f--- &bChunks sinalizados &f---");
+        m.send(sender, "comandos.farms.titulo");
         for (String key : plugin.getFarmController().getFlaggedChunks()) {
-            MessageUtil.send(sender, prefix, "&7• &f" + key);
+            m.send(sender, "comandos.farms.item", Map.of("{valor}", key));
         }
     }
 
-    private void sendHelp(CommandSender sender, String prefix) {
-        MessageUtil.send(sender, prefix, "&f/pperf status &7- Status de performance");
-        MessageUtil.send(sender, prefix, "&f/pperf chunk &7- Limites e contadores do chunk atual");
-        MessageUtil.send(sender, prefix, "&f/pperf farms &7- Chunks com alta concentração");
-        MessageUtil.send(sender, prefix, "&f/pperf reload &7- Recarrega o config.yml");
+    private void sendHelp(CommandSender sender) {
+        MessageManager m = plugin.getMessageManager();
+        m.send(sender, "comandos.ajuda.status");
+        m.send(sender, "comandos.ajuda.chunk");
+        m.send(sender, "comandos.ajuda.farms");
+        m.send(sender, "comandos.ajuda.reload");
     }
 
     @Override
