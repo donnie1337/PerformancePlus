@@ -26,6 +26,11 @@ public class ConfigManager {
         FileConfiguration cfg = raw();
         int value = cfg.contains(worldValuePath) ? cfg.getInt(worldValuePath, def)
                 : (cfg.contains(worldPath) ? cfg.getInt(worldPath, def) : cfg.getInt(path, def));
+        // O limite de hoppers é fixo: o valor configurado deve ser respeitado
+        // mesmo quando a proteção adaptativa estiver reduzindo outros limites.
+        // Assim, valor 20 significa sempre 20 hoppers por chunk.
+        if ("hoppers".equalsIgnoreCase(key)) return value;
+
         if (value <= 0 || !cfg.getBoolean("performance.protecao-adaptativa.habilitado", true)
                 || plugin.getPerformanceMonitor() == null) return value;
         return Math.max(1, (int) Math.floor(value * plugin.getPerformanceMonitor().getLimitMultiplier()));
