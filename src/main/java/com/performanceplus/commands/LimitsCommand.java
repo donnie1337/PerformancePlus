@@ -197,7 +197,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
         List<String> lore = guiLore(itemPath, "lore", guiLore(defaultPath, "lore", fallbackLore));
         List<String> parsedLore = new ArrayList<>();
         for (String line : lore) {
-            parsedLore.add(color(line));
+            parsedLore.add(color(line.replace("{criatura}", fallbackTitle.replace("&f", ""))));
         }
         ItemStack item = new ItemStack(configuredMaterial);
         ItemMeta meta = item.getItemMeta();
