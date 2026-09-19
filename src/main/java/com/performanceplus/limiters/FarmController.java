@@ -1,78 +1,88 @@
 package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
+import com.performanceplus.metrics.ChunkMetricsManager.Metrics;
 import com.performanceplus.util.ChunkUtils;
 import com.performanceplus.util.MessageUtil;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityRemoveEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Não escuta eventos diretamente — recebe contagens já calculadas pelo
- * ChunkScanTask (varredura periódica) e usa uma pontuação heurística
- * simples para sinalizar chunks que provavelmente são farms automáticas.
- *
- * A pontuação pesa mais hoppers/spawners/pistões/observers (indicadores
- * fortes de automação) do que mobs/itens sozinhos (que também aparecem em
- * áreas comuns do mapa, sem serem farms).
- */
-public class FarmController {
-
+public class FarmController implements Listener {
     private final PerformancePlus plugin;
     private final Set<String> flaggedChunks = ConcurrentHashMap.newKeySet();
 
-    public FarmController(PerformancePlus plugin) {
-        this.plugin = plugin;
+    public FarmController(PerformancePlus plugin) { this.plugin = plugin; }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onChunkLoad(ChunkLoadEvent event) { evaluate(event.getChunk()); }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockPlace(BlockPlaceEvent event) { evaluate(event.getBlock().getChunk()); }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockBreak(BlockBreakEvent event) { evaluate(event.getBlock().getChunk()); }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onEntitySpawn(EntitySpawnEvent event) { evaluate(event.getLocation().getChunk()); }
+
+    @EventHandler
+    public void onEntityRemove(EntityRemoveEvent event) {
+        if (event.getEntity().getLocation().getWorld() != null) {
+            evaluate(event.getEntity().getLocation().getChunk());
+        }
     }
 
-    public void updateScore(Chunk chunk, int mobs, int items, int hoppers, int spawners) {
-        if (!plugin.getConfigManager().getGlobalBoolean("farm-control.enabled", true)) {
-            return;
-        }
-        if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())) {
-            return;
-        }
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        flaggedChunks.remove(ChunkUtils.key(event.getChunk()));
+    }
 
-        int pistons = plugin.getPistonCount(chunk);
-        int observers = plugin.getObserverCount(chunk);
+    public void evaluate(Chunk chunk) {
+        if (!plugin.getConfigManager().getBoolean("farm.habilitado", true)
+                || plugin.getConfigManager().isWorldIgnored(chunk.getWorld())) return;
 
-        int score = (hoppers * 4) + (spawners * 6) + (pistons * 3) + (observers * 3) + mobs + (items / 2);
+        Metrics m = plugin.getMetricsManager().get(chunk);
+        int score = m.mobs()
+                + (m.items() / 2)
+                + (m.hoppers() * 4)
+                + (m.spawners() * 6)
+                + (m.pistons() * 3)
+                + (m.observers() * 3);
 
-        int threshold = plugin.getConfigManager().getGlobalInt("farm-control.activity-threshold", 50);
+        int threshold = plugin.getConfigManager().getLimit(chunk.getWorld(), "farm-pontuacao", 100);
         String key = ChunkUtils.key(chunk);
 
-        if (score >= threshold) {
-            boolean wasFlagged = flaggedChunks.contains(key);
-            flaggedChunks.add(key);
-            if (!wasFlagged) {
-                notifyStaff(chunk, score);
-            }
+        if (threshold > 0 && score >= threshold) {
+            if (flaggedChunks.add(key)) notifyStaff(chunk, score);
         } else {
             flaggedChunks.remove(key);
         }
     }
 
     private void notifyStaff(Chunk chunk, int score) {
-        if (!plugin.getConfigManager().getGlobalBoolean("farm-control.notify-staff", true)) {
-            return;
-        }
-
+        if (!plugin.getConfigManager().getBoolean("farm.notificar-staff", true)) return;
         String msg = plugin.getConfigManager().getPrefix()
-                + "&eProvável farm detectada em &f" + chunk.getWorld().getName()
-                + " (" + chunk.getX() + ", " + chunk.getZ() + ") &e- pontuação: &f" + score;
-
+                + "&eChunk com alta concentração de recursos: &f"
+                + chunk.getWorld().getName() + " " + chunk.getX() + "," + chunk.getZ()
+                + " &7(pontuação " + score + ").";
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             if (player.hasPermission("performanceplus.notify.farms")) {
                 player.sendMessage(MessageUtil.color(msg));
             }
         }
-        plugin.getLogger().info("Farm detectada em " + chunk.getWorld().getName()
-                + " (" + chunk.getX() + ", " + chunk.getZ() + ") - pontuação: " + score);
+        plugin.getLogger().warning("Chunk de alta concentração: " + ChunkUtils.key(chunk) + " score=" + score);
     }
 
-    public Set<String> getFlaggedChunks() {
-        return flaggedChunks;
-    }
+    public Set<String> getFlaggedChunks() { return flaggedChunks; }
 }
