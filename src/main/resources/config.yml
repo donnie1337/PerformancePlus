@@ -118,6 +118,281 @@ farm:
   habilitado: true
   notificar-staff: true
 
+
+# ============================================================
+# GUI - Limites
+# ============================================================
+# Toda a aparência e organização dos menus pode ser alterada aqui.
+# Slots começam em 0.
+gui:
+  principal:
+    titulo: "&8&lLimites"
+    tamanho: 27
+    categorias:
+      redstone:
+        slot: 10
+        material: "REDSTONE"
+        titulo: "&c&lRedstone"
+        lore:
+          - "&7Clique para visualizar os limites."
+      criaturas:
+        slot: 12
+        material: "CREEPER_SPAWN_EGG"
+        titulo: "&a&lCriaturas"
+        lore:
+          - "&7Clique para visualizar os limites."
+      geradores:
+        slot: 14
+        material: "SPAWNER"
+        titulo: "&5&lGeradores"
+        lore:
+          - "&7Clique para visualizar os limites."
+      decoracoes:
+        slot: 16
+        material: "ARMOR_STAND"
+        titulo: "&e&lDecorações"
+        lore:
+          - "&7Clique para visualizar os limites."
+
+  paginas:
+    redstone:
+      titulo: "&8&lLimites &8• &cRedstone"
+      tamanho: 54
+    geradores:
+      titulo: "&8&lLimites &8• &5Geradores"
+      tamanho: 27
+    decoracoes:
+      titulo: "&8&lLimites &8• &eDecorações"
+      tamanho: 27
+
+  criaturas:
+    titulo: "&8&lLimites &8• &aCriaturas"
+    tamanho: 27
+    categorias:
+      animais-terrestres:
+        slot: 9
+        material: "COW_SPAWN_EGG"
+        titulo: "&a&lAnimais terrestres"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      animais-aquaticos:
+        slot: 11
+        material: "COD_SPAWN_EGG"
+        titulo: "&b&lAnimais aquáticos"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      monstros-comuns:
+        slot: 13
+        material: "ZOMBIE_SPAWN_EGG"
+        titulo: "&c&lMonstros comuns"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      nether:
+        slot: 15
+        material: "BLAZE_SPAWN_EGG"
+        titulo: "&4&lNether"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      end:
+        slot: 17
+        material: "ENDERMAN_SPAWN_EGG"
+        titulo: "&5&lEnd"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      pillagers:
+        slot: 18
+        material: "PILLAGER_SPAWN_EGG"
+        titulo: "&6&lPillagers"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      aldeoes-traders:
+        slot: 20
+        material: "VILLAGER_SPAWN_EGG"
+        titulo: "&e&lAldeões e Traders"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      cavalos-especiais:
+        slot: 22
+        material: "HORSE_SPAWN_EGG"
+        titulo: "&b&lCavalos especiais"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      golems:
+        slot: 24
+        material: "IRON_GOLEM_SPAWN_EGG"
+        titulo: "&f&lGolems"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+      bosses:
+        slot: 26
+        material: "WITHER_SPAWN_EGG"
+        titulo: "&4&lBosses"
+        lore:
+          - "&7Clique para visualizar os limites."
+          - "&7Cada criatura possui limite e raio próprios."
+
+  itens:
+    redstone:
+      suporte-armaduras:
+        slot: 0
+        material: "ARMOR_STAND"
+        titulo: "&bSuporte de armaduras"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      carrinho-com-bau:
+        slot: 1
+        material: "CHEST_MINECART"
+        titulo: "&bCarrinho com baú"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      comparadores:
+        slot: 2
+        material: "COMPARATOR"
+        titulo: "&bComparador"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      ejetores:
+        slot: 3
+        material: "DISPENSER"
+        titulo: "&bEjetor"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      liberadores:
+        slot: 4
+        material: "DROPPER"
+        titulo: "&bLiberador"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      carrinho-com-fornalha:
+        slot: 5
+        material: "FURNACE_MINECART"
+        titulo: "&bCarrinho com fornalha"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      carrinho-com-funil:
+        slot: 6
+        material: "HOPPER_MINECART"
+        titulo: "&bCarrinho com funil"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      hoppers:
+        slot: 7
+        material: "HOPPER"
+        titulo: "&bFunil"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      carrinho-de-mina:
+        slot: 8
+        material: "MINECART"
+        titulo: "&bCarrinho de mina"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      observers:
+        slot: 9
+        material: "OBSERVER"
+        titulo: "&bObservador"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      pistoes:
+        slot: 10
+        material: "PISTON"
+        titulo: "&bPistão"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      blocos-de-redstone:
+        slot: 11
+        material: "REDSTONE_BLOCK"
+        titulo: "&bBloco de redstone"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      lampadas-de-redstone:
+        slot: 12
+        material: "REDSTONE_LAMP"
+        titulo: "&bLâmpada de redstone"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      tochas-de-redstone:
+        slot: 13
+        material: "REDSTONE_TORCH"
+        titulo: "&bTocha de redstone"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      po-de-redstone:
+        slot: 14
+        material: "REDSTONE"
+        titulo: "&bPó de redstone"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      repetidores:
+        slot: 15
+        material: "REPEATER"
+        titulo: "&bRepetidor"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      sensores-de-sculk:
+        slot: 16
+        material: "SCULK_SENSOR"
+        titulo: "&bSensor de sculk"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      pistoes-com-slime:
+        slot: 17
+        material: "STICKY_PISTON"
+        titulo: "&bPistão com slime"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      carrinho-com-dinamite:
+        slot: 18
+        material: "TNT_MINECART"
+        titulo: "&bCarrinho com dinamite"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+
+  navegacao:
+    voltar:
+      slot: 49
+      material: "ARROW"
+      titulo: "&fVoltar"
+      lore: []
+    pagina-anterior:
+      slot: 21
+      material: "ARROW"
+      titulo: "&fPágina anterior"
+      lore: []
+    proxima-pagina:
+      slot: 23
+      material: "ARROW"
+      titulo: "&fPróxima página"
+      lore: []
+
 # ============================================================
 # Proteção adaptativa
 # ============================================================
