@@ -159,7 +159,7 @@ public final class ChunkMetricsManager implements Listener {
         m.entities++;
         if (entity instanceof LivingEntity && !(entity instanceof Player)) m.mobs++;
         switch (entity.getType()) {
-            case DROPPED_ITEM -> m.items++;
+            case ITEM -> m.items++;
             case EXPERIENCE_ORB -> m.xpOrbs++;
             case HOPPER_MINECART -> m.hopperMinecarts++;
             default -> { }
