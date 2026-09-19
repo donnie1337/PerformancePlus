@@ -56,7 +56,7 @@ limites:
     acao-quando-exceder: "bloquear-atualizacao"
 
   chunks-gerados-por-segundo:
-    habilitado: true
+    habilitado: false
     valor: 20
 
   # Pontuação de concentração usada apenas para identificar áreas muito pesadas.
