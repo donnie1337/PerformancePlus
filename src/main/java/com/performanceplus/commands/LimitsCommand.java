@@ -1,12 +1,12 @@
 package com.performanceplus.commands;
 
 import com.performanceplus.PerformancePlus;
-import com.performanceplus.util.MessageManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,42 +21,26 @@ import java.util.List;
 
 public class LimitsCommand implements CommandExecutor, Listener {
 
-    private static final String MAIN_TITLE = "&8&lLimites";
-    private static final String REDSTONE_TITLE = "&8&lLimites &8• &cRedstone";
-    private static final String CREATURES_TITLE = "&8&lLimites &8• &aCriaturas";
-    private static final String GENERATORS_TITLE = "&8&lLimites &8• &5Geradores";
-    private static final String DECORATIONS_TITLE = "&8&lLimites &8• &eDecorações";
-
     private final PerformancePlus plugin;
 
     private static final Category[] CATEGORIES = {
-            new Category("redstone", "gui.categorias.redstone", Material.REDSTONE),
-            new Category("criaturas", "gui.categorias.criaturas", Material.CREEPER_SPAWN_EGG),
-            new Category("geradores", "gui.categorias.geradores", Material.SPAWNER),
-            new Category("decoracoes", "gui.categorias.decoracoes", Material.ARMOR_STAND)
+            new Category("redstone", Material.REDSTONE),
+            new Category("criaturas", Material.CREEPER_SPAWN_EGG),
+            new Category("geradores", Material.SPAWNER),
+            new Category("decoracoes", Material.ARMOR_STAND)
     };
 
     private static final CreatureCategory[] CREATURE_CATEGORIES = {
-            new CreatureCategory("animais-terrestres", "gui.criaturas.animais-terrestres", Material.COW_SPAWN_EGG,
-                    "cow", "sheep", "pig", "chicken", "horse", "donkey", "mule", "rabbit", "fox", "wolf"),
-            new CreatureCategory("animais-aquaticos", "gui.criaturas.animais-aquaticos", Material.COD_SPAWN_EGG,
-                    "cod", "salmon", "tropical_fish", "pufferfish", "squid", "glow_squid", "dolphin", "turtle", "axolotl", "guardian"),
-            new CreatureCategory("monstros-comuns", "gui.criaturas.monstros-comuns", Material.ZOMBIE_SPAWN_EGG,
-                    "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime", "phantom", "enderman", "silverfish"),
-            new CreatureCategory("nether", "gui.criaturas.nether", Material.BLAZE_SPAWN_EGG,
-                    "blaze", "ghast", "magma_cube", "piglin", "piglin_brute", "zombified_piglin", "hoglin", "zoglin", "wither_skeleton", "strider"),
-            new CreatureCategory("end", "gui.criaturas.end", Material.ENDERMAN_SPAWN_EGG,
-                    "enderman", "shulker", "ender_dragon"),
-            new CreatureCategory("pillagers", "gui.criaturas.pillagers", Material.PILLAGER_SPAWN_EGG,
-                    "pillager", "vindicator", "evoker", "ravager", "illusioner"),
-            new CreatureCategory("aldeoes-traders", "gui.criaturas.aldeoes-traders", Material.VILLAGER_SPAWN_EGG,
-                    "villager", "wandering_trader"),
-            new CreatureCategory("cavalos-especiais", "gui.criaturas.cavalos-especiais", Material.HORSE_SPAWN_EGG,
-                    "horse", "donkey", "mule", "skeleton_horse", "zombie_horse", "camel"),
-            new CreatureCategory("golems", "gui.criaturas.golems", Material.IRON_GOLEM_SPAWN_EGG,
-                    "iron_golem", "snow_golem"),
-            new CreatureCategory("bosses", "gui.criaturas.bosses", Material.WITHER_SPAWN_EGG,
-                    "wither", "ender_dragon")
+            new CreatureCategory("animais-terrestres", "cow", "sheep", "pig", "chicken", "horse", "donkey", "mule", "rabbit", "fox", "wolf"),
+            new CreatureCategory("animais-aquaticos", "cod", "salmon", "tropical_fish", "pufferfish", "squid", "glow_squid", "dolphin", "turtle", "axolotl", "guardian"),
+            new CreatureCategory("monstros-comuns", "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime", "phantom", "enderman", "silverfish"),
+            new CreatureCategory("nether", "blaze", "ghast", "magma_cube", "piglin", "piglin_brute", "zombified_piglin", "hoglin", "zoglin", "wither_skeleton", "strider"),
+            new CreatureCategory("end", "enderman", "shulker", "ender_dragon"),
+            new CreatureCategory("pillagers", "pillager", "vindicator", "evoker", "ravager", "illusioner"),
+            new CreatureCategory("aldeoes-traders", "villager", "wandering_trader"),
+            new CreatureCategory("cavalos-especiais", "horse", "donkey", "mule", "skeleton_horse", "zombie_horse", "camel"),
+            new CreatureCategory("golems", "iron_golem", "snow_golem"),
+            new CreatureCategory("bosses", "wither", "ender_dragon")
     };
 
     public LimitsCommand(PerformancePlus plugin) {
@@ -77,152 +61,171 @@ public class LimitsCommand implements CommandExecutor, Listener {
         openMain(player);
     }
 
-    private void openMain(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 27, color(MAIN_TITLE));
+    private ConfigurationSection gui(String path) {
+        return plugin.getConfig().getConfigurationSection("gui." + path);
+    }
 
-        setCategory(inventory, 10, CATEGORIES[0]);
-        setCategory(inventory, 12, CATEGORIES[1]);
-        setCategory(inventory, 14, CATEGORIES[2]);
-        setCategory(inventory, 16, CATEGORIES[3]);
+    private String guiString(String path, String key, String def) {
+        ConfigurationSection section = gui(path);
+        return section == null ? def : section.getString(key, def);
+    }
+
+    private int guiInt(String path, String key, int def) {
+        ConfigurationSection section = gui(path);
+        return section == null ? def : section.getInt(key, def);
+    }
+
+    private List<String> guiLore(String path, String key, List<String> def) {
+        ConfigurationSection section = gui(path);
+        return section == null ? def : section.getStringList(key);
+    }
+
+    private Material guiMaterial(String path, String key, Material def) {
+        String value = guiString(path, key, def.name());
+        try {
+            return Material.valueOf(value.toUpperCase());
+        } catch (IllegalArgumentException ignored) {
+            return def;
+        }
+    }
+
+    private String mainTitle() {
+        return guiString("principal", "titulo", "&8&lLimites");
+    }
+
+    private void openMain(Player player) {
+        int size = guiInt("principal", "tamanho", 27);
+        Inventory inventory = Bukkit.createInventory(null, size, color(mainTitle()));
+
+        for (Category category : CATEGORIES) {
+            String path = "principal.categorias." + category.key;
+            int slot = guiInt(path, "slot", -1);
+            if (slot < 0 || slot >= size) continue;
+            inventory.setItem(slot, createConfiguredItem(path, category.material, category.key, List.of("&7Clique para visualizar os limites."), -1));
+        }
 
         player.openInventory(inventory);
     }
 
     private void openCategory(Player player, Category category) {
         switch (category.key) {
-            case "redstone" -> openLimitPage(player, REDSTONE_TITLE, category.key, List.of(
-                    "suporte-armaduras", "carrinho-com-bau", "comparadores", "ejetores", "liberadores",
-                    "carrinho-com-fornalha", "carrinho-com-funil", "hoppers", "carrinho-de-mina",
-                    "observers", "pistoes", "blocos-de-redstone", "lampadas-de-redstone",
-                    "tochas-de-redstone", "po-de-redstone", "repetidores", "sensores-de-sculk",
-                    "pistoes-com-slime", "carrinho-com-dinamite"));
+            case "redstone" -> openLimitPage(player, "redstone", REDSTONE_KEYS);
             case "criaturas" -> openCreatureCategories(player);
-            case "geradores" -> openLimitPage(player, GENERATORS_TITLE, category.key,
-                    List.of("spawners"));
-            case "decoracoes" -> openLimitPage(player, DECORATIONS_TITLE, category.key,
-                    List.of("entidades", "itens", "xp-orbes"));
+            case "geradores" -> openLimitPage(player, "geradores", List.of("spawners"));
+            case "decoracoes" -> openLimitPage(player, "decoracoes", List.of("entidades", "itens", "xp-orbes"));
         }
     }
 
-    private void openCreatureCategories(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 27, color(CREATURES_TITLE));
+    private static final List<String> REDSTONE_KEYS = List.of(
+            "suporte-armaduras", "carrinho-com-bau", "comparadores", "ejetores", "liberadores",
+            "carrinho-com-fornalha", "carrinho-com-funil", "hoppers", "carrinho-de-mina",
+            "observers", "pistoes", "blocos-de-redstone", "lampadas-de-redstone",
+            "tochas-de-redstone", "po-de-redstone", "repetidores", "sensores-de-sculk",
+            "pistoes-com-slime", "carrinho-com-dinamite"
+    );
 
-        int[] categorySlots = {9, 11, 13, 15, 17, 18, 20, 22, 24, 26};
-        for (int i = 0; i < CREATURE_CATEGORIES.length; i++) {
-            int slot = categorySlots[i];
-            if (slot >= 27) {
-                break;
-            }
-            CreatureCategory category = CREATURE_CATEGORIES[i];
-            ItemStack item = new ItemStack(category.material);
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                meta.setDisplayName(color(plugin.getMessageManager().get(category.messageKey)));
-                meta.setLore(List.of(
-                        color("&7Clique para visualizar os limites."),
-                        color("&7Cada criatura possui limite e raio próprios.")
-                ));
-                item.setItemMeta(meta);
-            }
-            inventory.setItem(slot, item);
+    private void openLimitPage(Player player, String page, List<String> keys) {
+        String path = "paginas." + page;
+        int size = guiInt(path, "tamanho", page.equals("redstone") ? 54 : 27);
+        String title = guiString(path, "titulo", "&8&lLimites");
+        Inventory inventory = Bukkit.createInventory(null, size, color(title));
+
+        for (String key : keys) {
+            String itemPath = "itens." + key;
+            int slot = guiInt(itemPath, "slot", -1);
+            if (slot < 0 || slot >= size) continue;
+            inventory.setItem(slot, createConfiguredItem(itemPath, materialForLimit(key), key,
+                    List.of("&7Limite: &f{limite}", "&7Por chunk"), currentLimit(player, key)));
+        }
+
+        setNavigation(inventory, "voltar");
+        player.openInventory(inventory);
+    }
+
+    private void openCreatureCategories(Player player) {
+        String path = "criaturas";
+        int size = guiInt(path, "tamanho", 27);
+        String title = guiString(path, "titulo", "&8&lLimites &8• &aCriaturas");
+        Inventory inventory = Bukkit.createInventory(null, size, color(title));
+
+        for (CreatureCategory category : CREATURE_CATEGORIES) {
+            String categoryPath = path + ".categorias." + category.key;
+            int slot = guiInt(categoryPath, "slot", -1);
+            if (slot < 0 || slot >= size) continue;
+            inventory.setItem(slot, createConfiguredItem(categoryPath, defaultCreatureCategoryMaterial(category), category.key,
+                    List.of("&7Clique para visualizar os limites.", "&7Cada criatura possui limite e raio próprios."), -1));
         }
 
         player.openInventory(inventory);
     }
 
     private void openCreaturePage(Player player, CreatureCategory category, int page) {
-        int perPage = 21;
+        String path = "criatura-itens";
+        int size = guiInt(path, "tamanho", 27);
+        String title = guiString("criatura-paginas." + category.key, "titulo",
+                guiString("criaturas.categorias." + category.key, "titulo", "&8&lLimites"));
+        Inventory inventory = Bukkit.createInventory(null, size, color(title));
+
+        int perPage = Math.max(1, guiInt(path, "itens-por-pagina", 21));
         int start = page * perPage;
         int end = Math.min(start + perPage, category.mobs.size());
 
-        Inventory inventory = Bukkit.createInventory(null, 27,
-                color(plugin.getMessageManager().get(category.messageKey)));
-
         for (int i = start; i < end; i++) {
             String mob = category.mobs.get(i);
-            Material icon = resolveSpawnEgg(mob);
-            ItemStack item = new ItemStack(icon);
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                meta.setDisplayName(color("&f" + formatMobName(mob)));
-                meta.setLore(List.of(
-                        color("&7Limite: &fNão configurado"),
-                        color("&7Raio: &fNão configurado"),
-                        "",
-                        color("&8Configuração individual por criatura.")
-                ));
-                item.setItemMeta(meta);
-            }
-            inventory.setItem(i - start, item);
+            String itemPath = path + "." + mob;
+            int defaultSlot = i - start;
+            int slot = guiInt(itemPath, "slot", defaultSlot);
+            if (slot < 0 || slot >= size) continue;
+
+            Material material = resolveSpawnEgg(mob);
+            String defaultTitle = "&f" + formatMobName(mob);
+            List<String> defaultLore = List.of("&7Limite: &fNão configurado", "&7Raio: &fNão configurado", "", "&8Configuração individual por criatura.");
+            inventory.setItem(slot, createConfiguredItem(itemPath, material, mob, defaultLore, -1, defaultTitle));
         }
 
-        addNavigation(inventory, page > 0, end < category.mobs.size());
+        if (page > 0) setNavigation(inventory, "pagina-anterior");
+        setNavigation(inventory, "voltar");
+        if (end < category.mobs.size()) setNavigation(inventory, "proxima-pagina");
+
         player.openInventory(inventory);
     }
 
-    private void openLimitPage(Player player, String title, String category, List<String> keys) {
-        Inventory inventory = Bukkit.createInventory(null, 54, color(title));
+    private ItemStack createConfiguredItem(String path, Material fallbackMaterial, String key, List<String> fallbackLore, int limit) {
+        return createConfiguredItem(path, fallbackMaterial, key, fallbackLore, limit, null);
+    }
 
-        int slot = 0;
-        for (String key : keys) {
-            ItemStack item = new ItemStack(materialForLimit(key));
-            ItemMeta meta = item.getItemMeta();
-            if (meta != null) {
-                meta.setDisplayName(color(limitName(key)));
-                meta.setLore(List.of(
-                        color("&7Limite: &f" + currentLimit(player, key)),
-                        color("&7Por chunk")
-                ));
-                item.setItemMeta(meta);
-            }
-            inventory.setItem(slot++, item);
+    private ItemStack createConfiguredItem(String path, Material fallbackMaterial, String key, List<String> fallbackLore, int limit, String fallbackTitle) {
+        Material material = guiMaterial(path, "material", fallbackMaterial);
+        String title = guiString(path, "titulo", fallbackTitle != null ? fallbackTitle : key);
+        List<String> lore = guiLore(path, "lore", fallbackLore);
+
+        List<String> parsedLore = new ArrayList<>();
+        for (String line : lore) {
+            parsedLore.add(color(line.replace("{limite}", String.valueOf(limit))));
         }
 
-        setBackButton(inventory, 49);
-        player.openInventory(inventory);
+        ItemStack item = new ItemStack(material);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(color(title));
+            meta.setLore(parsedLore);
+            item.setItemMeta(meta);
+        }
+        return item;
+    }
+
+    private void setNavigation(Inventory inventory, String key) {
+        String path = "navegacao." + key;
+        int slot = guiInt(path, "slot", key.equals("voltar") ? 49 : key.equals("pagina-anterior") ? 21 : 23);
+        if (slot < 0 || slot >= inventory.getSize()) return;
+        Material material = guiMaterial(path, "material", Material.ARROW);
+        String title = guiString(path, "titulo", "&fVoltar");
+        List<String> lore = guiLore(path, "lore", List.of());
+        inventory.setItem(slot, createConfiguredItem(path, material, key, lore, -1, title));
     }
 
     private int currentLimit(Player player, String key) {
         return plugin.getConfigManager().getLimit(player.getWorld(), key, 0);
-    }
-
-    private void addNavigation(Inventory inventory, boolean previous, boolean next) {
-        if (previous) {
-            setButton(inventory, 21, Material.ARROW, "&fPágina anterior");
-        }
-        setBackButton(inventory);
-        if (next) {
-            setButton(inventory, 23, Material.ARROW, "&fPróxima página");
-        }
-    }
-
-    private void setBackButton(Inventory inventory) {
-        setBackButton(inventory, 22);
-    }
-
-    private void setBackButton(Inventory inventory, int slot) {
-        setButton(inventory, slot, Material.ARROW, "&fVoltar");
-    }
-
-    private void setButton(Inventory inventory, int slot, Material material, String name) {
-        ItemStack item = new ItemStack(material);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(color(name));
-            item.setItemMeta(meta);
-        }
-        inventory.setItem(slot, item);
-    }
-
-    private void setCategory(Inventory inventory, int slot, Category category) {
-        ItemStack item = new ItemStack(category.material);
-        ItemMeta meta = item.getItemMeta();
-        if (meta != null) {
-            meta.setDisplayName(color(plugin.getMessageManager().get(category.messageKey)));
-            meta.setLore(List.of(color("&7Clique para visualizar os limites.")));
-            item.setItemMeta(meta);
-        }
-        inventory.setItem(slot, item);
     }
 
     private Material materialForLimit(String key) {
@@ -254,39 +257,25 @@ public class LimitsCommand implements CommandExecutor, Listener {
         };
     }
 
-    private String limitName(String key) {
-        return switch (key) {
-            case "suporte-armaduras" -> "&bSuporte de armaduras";
-            case "carrinho-com-bau" -> "&bCarrinho com baú";
-            case "comparadores" -> "&bComparador";
-            case "ejetores" -> "&bEjetor";
-            case "liberadores" -> "&bLiberador";
-            case "carrinho-com-fornalha" -> "&bCarrinho com fornalha";
-            case "carrinho-com-funil" -> "&bCarrinho com funil";
-            case "hoppers" -> "&bFunil";
-            case "carrinho-de-mina" -> "&bCarrinho de mina";
-            case "observers" -> "&bObservador";
-            case "pistoes" -> "&bPistão";
-            case "blocos-de-redstone" -> "&bBloco de redstone";
-            case "lampadas-de-redstone" -> "&bLâmpada de redstone";
-            case "tochas-de-redstone" -> "&bTocha de redstone";
-            case "po-de-redstone" -> "&bPó de redstone";
-            case "repetidores" -> "&bRepetidor";
-            case "sensores-de-sculk" -> "&bSensor de sculk";
-            case "pistoes-com-slime" -> "&bPistão com slime";
-            case "carrinho-com-dinamite" -> "&bCarrinho com dinamite";
-            case "spawners" -> "&dSpawners";
-            case "entidades" -> "&eEntidades";
-            case "itens" -> "&eItens";
-            case "xp-orbes" -> "&eOrbes de XP";
-            default -> "&bRedstone";
+    private Material defaultCreatureCategoryMaterial(CreatureCategory category) {
+        return switch (category.key) {
+            case "animais-terrestres" -> Material.COW_SPAWN_EGG;
+            case "animais-aquaticos" -> Material.COD_SPAWN_EGG;
+            case "monstros-comuns" -> Material.ZOMBIE_SPAWN_EGG;
+            case "nether" -> Material.BLAZE_SPAWN_EGG;
+            case "end" -> Material.ENDERMAN_SPAWN_EGG;
+            case "pillagers" -> Material.PILLAGER_SPAWN_EGG;
+            case "aldeoes-traders" -> Material.VILLAGER_SPAWN_EGG;
+            case "cavalos-especiais" -> Material.HORSE_SPAWN_EGG;
+            case "golems" -> Material.IRON_GOLEM_SPAWN_EGG;
+            case "bosses" -> Material.WITHER_SPAWN_EGG;
+            default -> Material.CHEST;
         };
     }
 
     private Material resolveSpawnEgg(String mob) {
-        String material = mob.toUpperCase() + "_SPAWN_EGG";
         try {
-            return Material.valueOf(material);
+            return Material.valueOf(mob.toUpperCase() + "_SPAWN_EGG");
         } catch (IllegalArgumentException ignored) {
             return Material.PLAYER_HEAD;
         }
@@ -306,42 +295,59 @@ public class LimitsCommand implements CommandExecutor, Listener {
         return text.replace('&', '§');
     }
 
+    private boolean isMainTitle(String title) {
+        return color(mainTitle()).equals(title);
+    }
+
+    private boolean isCategoryTitle(String title) {
+        return color(guiString("criaturas", "titulo", "&8&lLimites &8• &aCriaturas")).equals(title);
+    }
+
+    private boolean isLimitPageTitle(String title, String page) {
+        return color(guiString("paginas." + page, "titulo", "&8&lLimites")).equals(title);
+    }
+
+    private CreatureCategory findCreatureCategory(String title) {
+        for (CreatureCategory category : CREATURE_CATEGORIES) {
+            String configured = guiString("criatura-paginas." + category.key, "titulo", "");
+            if (!configured.isEmpty() && color(configured).equals(title)) return category;
+            String fallback = guiString("criaturas.categorias." + category.key, "titulo", "");
+            if (!fallback.isEmpty() && color(fallback).equals(title)) return category;
+        }
+        return null;
+    }
+
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (isLimitsInventory(event.getView().getTitle())) {
-            event.setCancelled(true);
-        }
+        if (isLimitsInventory(event.getView().getTitle())) event.setCancelled(true);
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         String title = event.getView().getTitle();
-        if (!isLimitsInventory(title)) {
-            return;
-        }
+        if (!isLimitsInventory(title)) return;
 
         event.setCancelled(true);
-        if (!(event.getWhoClicked() instanceof Player player)) {
-            return;
-        }
+        if (!(event.getWhoClicked() instanceof Player player)) return;
 
         int slot = event.getRawSlot();
-        if (slot < 0 || slot >= event.getView().getTopInventory().getSize()) {
+        if (slot < 0 || slot >= event.getView().getTopInventory().getSize()) return;
+
+        if (isMainTitle(title)) {
+            for (Category category : CATEGORIES) {
+                String path = "principal.categorias." + category.key;
+                if (slot == guiInt(path, "slot", -1)) {
+                    openCategory(player, category);
+                    return;
+                }
+            }
             return;
         }
 
-        if (isTitle(title, MAIN_TITLE)) {
-            if (slot == 10) openCategory(player, CATEGORIES[0]);
-            else if (slot == 12) openCategory(player, CATEGORIES[1]);
-            else if (slot == 14) openCategory(player, CATEGORIES[2]);
-            else if (slot == 16) openCategory(player, CATEGORIES[3]);
-            return;
-        }
-
-        if (isTitle(title, CREATURES_TITLE)) {
+        if (isCategoryTitle(title)) {
             for (CreatureCategory category : CREATURE_CATEGORIES) {
-                ItemStack clicked = event.getCurrentItem();
-                if (clicked != null && clicked.getType() == category.material) {
+                String path = "criaturas.categorias." + category.key;
+                if (slot == guiInt(path, "slot", -1)) {
                     openCreaturePage(player, category, 0);
                     return;
                 }
@@ -349,51 +355,41 @@ public class LimitsCommand implements CommandExecutor, Listener {
             return;
         }
 
-        if (slot == 22) {
-            openMain(player);
+        if (isLimitPageTitle(title, "redstone") || isLimitPageTitle(title, "geradores") || isLimitPageTitle(title, "decoracoes")) {
+            if (slot == guiInt("navegacao.voltar", "slot", 49)) openMain(player);
             return;
         }
 
-        if (isTitle(title, REDSTONE_TITLE) || isTitle(title, GENERATORS_TITLE) || isTitle(title, DECORATIONS_TITLE)) {
-            return;
-        }
-
-        for (CreatureCategory category : CREATURE_CATEGORIES) {
-            if (isTitle(title, plugin.getMessageManager().get(category.messageKey))) {
-                int page = 0;
-                if (slot == 23) page = 1;
-                if (slot == 21) page = 0;
-                if (slot == 22) {
-                    openCreatureCategories(player);
-                    return;
-                }
-                openCreaturePage(player, category, page);
+        CreatureCategory creatureCategory = findCreatureCategory(title);
+        if (creatureCategory != null) {
+            if (slot == guiInt("navegacao.voltar", "slot", 49)) {
+                openCreatureCategories(player);
                 return;
+            }
+            if (slot == guiInt("navegacao.pagina-anterior", "slot", 21)) {
+                openCreaturePage(player, creatureCategory, 0);
+                return;
+            }
+            if (slot == guiInt("navegacao.proxima-pagina", "slot", 23)) {
+                openCreaturePage(player, creatureCategory, 1);
             }
         }
     }
 
     private boolean isLimitsInventory(String title) {
         if (title == null) return false;
-        if (isTitle(title, MAIN_TITLE) || isTitle(title, REDSTONE_TITLE)
-                || isTitle(title, CREATURES_TITLE) || isTitle(title, GENERATORS_TITLE)
-                || isTitle(title, DECORATIONS_TITLE)) {
-            return true;
-        }
-        for (CreatureCategory category : CREATURE_CATEGORIES) {
-            if (isTitle(title, plugin.getMessageManager().get(category.messageKey))) return true;
-        }
-        return false;
+        if (isMainTitle(title) || isCategoryTitle(title)
+                || isLimitPageTitle(title, "redstone")
+                || isLimitPageTitle(title, "geradores")
+                || isLimitPageTitle(title, "decoracoes")) return true;
+        return findCreatureCategory(title) != null;
     }
 
-    private boolean isTitle(String actual, String expected) {
-        return color(expected).equals(actual);
-    }
+    private record Category(String key, Material material) {}
 
-    private record Category(String key, String messageKey, Material material) {}
-    private record CreatureCategory(String key, String messageKey, Material material, List<String> mobs) {
-        CreatureCategory(String key, String messageKey, Material material, String... mobs) {
-            this(key, messageKey, material, List.of(mobs));
+    private record CreatureCategory(String key, List<String> mobs) {
+        CreatureCategory(String key, String... mobs) {
+            this(key, List.of(mobs));
         }
     }
 }
