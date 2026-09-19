@@ -55,6 +55,56 @@ limites:
     # monitorar = apenas registra a carga, sem alterar o redstone.
     acao-quando-exceder: "bloquear-atualizacao"
 
+  # Componentes de Redstone
+  suporte-armaduras:
+    habilitado: true
+    valor: 10
+  carrinho-com-bau:
+    habilitado: true
+    valor: 4
+  comparadores:
+    habilitado: true
+    valor: 28
+  ejetores:
+    habilitado: true
+    valor: 14
+  liberadores:
+    habilitado: true
+    valor: 14
+  carrinho-com-fornalha:
+    habilitado: true
+    valor: 4
+  carrinho-com-funil:
+    habilitado: true
+    valor: 4
+  carrinho-de-mina:
+    habilitado: true
+    valor: 4
+  blocos-de-redstone:
+    habilitado: true
+    valor: 20
+  lampadas-de-redstone:
+    habilitado: true
+    valor: 36
+  tochas-de-redstone:
+    habilitado: true
+    valor: 32
+  po-de-redstone:
+    habilitado: true
+    valor: 32
+  repetidores:
+    habilitado: true
+    valor: 28
+  sensores-de-sculk:
+    habilitado: true
+    valor: 12
+  pistoes-com-slime:
+    habilitado: true
+    valor: 20
+  carrinho-com-dinamite:
+    habilitado: true
+    valor: 4
+
   chunks-gerados-por-segundo:
     habilitado: false
     valor: 20
