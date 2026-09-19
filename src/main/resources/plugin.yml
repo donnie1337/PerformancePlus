@@ -1,10 +1,6 @@
 name: PerformancePlus
 version: '1.0.0'
 main: com.performanceplus.PerformancePlus
-# api-version fica em 1.21 de propósito: esse campo funciona como uma versão
-# MÍNIMA exigida (o servidor recusa o plugin se pedir algo mais novo do que
-# ele próprio é), então deixar em 1.21 é o que permite o mesmo jar rodar
-# tanto em 1.21.x quanto em versões 26.x (Chaos Cubed e além).
 api-version: '1.21'
 author: SeuNome
 description: Plugin de controle e otimização de performance para servidores Spigot/Bukkit.
@@ -14,6 +10,9 @@ commands:
     description: Comando principal do PerformancePlus
     aliases: [pperf, pp]
     usage: /<command> [status|chunk|farms|recount|reload|help]
+  limites:
+    description: Mostra os limites ativos do servidor
+    usage: /limites
 
 permissions:
   performanceplus.admin:
