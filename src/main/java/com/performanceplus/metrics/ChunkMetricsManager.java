@@ -178,6 +178,7 @@ public final class ChunkMetricsManager implements Listener {
     private void removeEntity(Metrics m, Entity entity, String chunkKey) {
         String tracked = entityLocations.get(entity.getUniqueId());
         if (tracked != null && chunkKey != null && !tracked.equals(chunkKey)) return;
+        if (tracked == null) return;
         entityLocations.remove(entity.getUniqueId(), tracked);
         m.entities = Math.max(0, m.entities - 1);
         if (entity instanceof LivingEntity && !(entity instanceof Player)) m.mobs = Math.max(0, m.mobs - 1);
