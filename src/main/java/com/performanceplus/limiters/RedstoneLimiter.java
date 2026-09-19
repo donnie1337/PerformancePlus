@@ -9,19 +9,15 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
 /**
- * BlockRedstoneEvent NÃO é cancelável — para "bloquear" uma atualização,
- * a técnica padrão é forçar newCurrent = oldCurrent, o que faz o Bukkit
- * tratar como se nada tivesse mudado.
- *
- * Este evento dispara com MUITA frequência (a cada mudança de nível de
- * corrente em cada bloco de redstone), então a contagem por chunk usa
- * um CooldownTracker leve (um Map + aritmética simples) para não pesar
- * no tick do servidor.
+ * Limita atualizações de redstone por chunk usando uma janela curta,
+ * aproximando um tick (50 ms). A configuração continua expressa em
+ * atualizações por chunk por tick; não há mais a conversão incorreta para
+ * "valor x 20 por segundo".
  */
 public class RedstoneLimiter implements Listener {
 
     private final PerformancePlus plugin;
-    private final CooldownTracker tracker = new CooldownTracker(1000L);
+    private final CooldownTracker tracker = new CooldownTracker(50L);
 
     public RedstoneLimiter(PerformancePlus plugin) {
         this.plugin = plugin;
@@ -40,12 +36,8 @@ public class RedstoneLimiter implements Listener {
             return;
         }
 
-        // Convertido para uma janela de 1s (20 ticks) para reduzir o overhead
-        // de reiniciar o contador a cada tick individual.
-        int windowLimit = perTickLimit * 20;
-
         int count = tracker.registerAndCount(ChunkUtils.key(chunk));
-        if (count > windowLimit) {
+        if (count > perTickLimit) {
             event.setNewCurrent(event.getOldCurrent());
         }
     }
