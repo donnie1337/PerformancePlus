@@ -14,7 +14,7 @@ mundos:
 limites:
   mobs:
     habilitado: true
-    valor: 60
+    valor: 8
 
   entidades:
     habilitado: true
