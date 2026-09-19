@@ -2,13 +2,14 @@ package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.metrics.ChunkMetricsManager.Metrics;
-import com.performanceplus.util.MessageUtil;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
+
+import java.util.Map;
 
 public class ObserverController implements Listener {
     private final PerformancePlus plugin;
@@ -30,8 +31,8 @@ public class ObserverController implements Listener {
         Metrics m = plugin.getMetricsManager().get(chunk);
         if (m.observers() >= limit) {
             event.setCancelled(true);
-            MessageUtil.send(player, plugin.getConfigManager().getPrefix(),
-                    "&cLimite de &f" + limit + " &cobserver(s) por chunk atingido.");
+            plugin.getMessageManager().send(player, "limites.observers",
+                    Map.of("{limite}", String.valueOf(limit)));
         }
     }
 
