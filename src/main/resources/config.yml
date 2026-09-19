@@ -1,0 +1,78 @@
+# =========================================================
+#  PerformancePlus - Configuração
+# =========================================================
+#
+#  Todas as chaves em "limits" valem para todos os mundos por padrão.
+#  Para sobrescrever um valor em um mundo específico, use a seção
+#  "worlds" no final deste arquivo (veja o exemplo já incluído).
+
+settings:
+  # Intervalo (em ticks) das varreduras periódicas de chunk, usadas para
+  # limpeza automática de itens/orbes e para a detecção de farms.
+  # 20 ticks = 1 segundo.
+  check-interval-ticks: 100
+
+  # Mundos totalmente ignorados por TODOS os limitadores deste plugin.
+  ignored-worlds: []
+
+  # Prefixo usado nas mensagens do plugin (aceita códigos de cor com &).
+  language-prefix: "&8[&b&lPerformance&f&lPlus&8] &7"
+
+  auto-cleanup:
+    # Se true, remove periodicamente itens dropados e orbes de XP que
+    # excedam o limite configurado. Mobs NUNCA são removidos automaticamente
+    # por essa rotina (apenas bloqueados no momento do spawn), para evitar
+    # matar animais domesticados ou farms legítimas por engano.
+    enabled: false
+
+# Limites padrão (globais). Podem ser sobrescritos por mundo na seção "worlds".
+limits:
+  mobs-per-chunk: 60
+  spawners-per-chunk: 4
+  entities-per-chunk: 100
+  items-per-chunk: 40
+  xp-orbs-per-chunk: 30
+  hoppers-per-chunk: 8
+
+  # Quantidade de eventos de redstone tolerados por chunk, POR TICK, antes
+  # de o plugin começar a "engolir" as próximas atualizações. Internamente
+  # isso é convertido para uma janela de 1 segundo (valor x 20).
+  redstone-updates-per-chunk-per-tick: 25
+
+  pistons-per-chunk: 12
+  piston-activations-per-second: 8
+  observers-per-chunk: 12
+
+  # Limite de chunks NOVOS (nunca gerados antes) por segundo, contado para
+  # o servidor inteiro. Esse módulo é apenas de alerta/monitoramento — o
+  # Bukkit não permite cancelar a geração de um chunk depois que ela já
+  # aconteceu (veja o README.md para mais detalhes e alternativas).
+  max-chunks-generated-per-second: 10
+
+farm-control:
+  enabled: true
+  # Pontuação mínima de "atividade" para um chunk ser sinalizado como
+  # provável farm automática. Veja o README.md para entender como a
+  # pontuação é calculada e como ajustar esse valor.
+  activity-threshold: 50
+  notify-staff: true
+
+monitoring:
+  enabled: true
+  tps-warning-threshold: 18.0
+  mspt-warning-threshold: 50.0
+  broadcast-to-ops: true
+
+# Configurações específicas por mundo. Qualquer chave definida dentro de
+# "worlds.<nome-do-mundo>.limits" sobrescreve o valor global equivalente,
+# apenas para aquele mundo.
+worlds:
+  world_nether:
+    limits:
+      mobs-per-chunk: 40
+      pistons-per-chunk: 8
+  # Exemplo para um mundo de farms, com limites mais permissivos:
+  # farm_world:
+  #   limits:
+  #     hoppers-per-chunk: 20
+  #     redstone-updates-per-chunk-per-tick: 60

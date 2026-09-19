@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.performanceplus</groupId>
+    <artifactId>PerformancePlus</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>PerformancePlus</name>
+    <description>Plugin de controle e otimização de performance para servidores Spigot/Bukkit.</description>
+
+    <properties>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!--
+          Versão do artefato spigot-api. O Minecraft passou a usar numeração
+          por ano depois da 1.21.11 (ex: 26.1, 26.1.1, 26.2...). Se o Maven
+          não conseguir baixar essa versão exata do repositório do Spigot,
+          troque para a versão que você gerou com o BuildTools localmente
+          (veja o README.md, seção "Como compilar").
+        -->
+        <spigot.version>26.2-R0.1-SNAPSHOT</spigot.version>
+    </properties>
+
+    <repositories>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+        </repository>
+    </repositories>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>${spigot.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <defaultGoal>clean package</defaultGoal>
+    </build>
+</project>
