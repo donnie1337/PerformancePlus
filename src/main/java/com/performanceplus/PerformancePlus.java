@@ -14,8 +14,8 @@ import com.performanceplus.limiters.PistonController;
 import com.performanceplus.limiters.RedstoneLimiter;
 import com.performanceplus.limiters.SpawnerLimiter;
 import com.performanceplus.limiters.XPLimiter;
+import com.performanceplus.metrics.ChunkMetricsManager;
 import com.performanceplus.monitor.PerformanceMonitor;
-import com.performanceplus.tasks.ChunkScanTask;
 import org.bukkit.Chunk;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
@@ -24,40 +24,37 @@ import org.bukkit.plugin.java.JavaPlugin;
 public class PerformancePlus extends JavaPlugin {
 
     private static PerformancePlus instance;
-
     private ConfigManager configManager;
     private PerformanceMonitor performanceMonitor;
+    private ChunkMetricsManager metricsManager;
     private FarmController farmController;
-    private PistonController pistonController;
-    private ObserverController observerController;
 
     @Override
     public void onEnable() {
         instance = this;
-
         saveDefaultConfig();
-        this.configManager = new ConfigManager(this);
-        this.farmController = new FarmController(this);
-        this.pistonController = new PistonController(this);
-        this.observerController = new ObserverController(this);
+        configManager = new ConfigManager(this);
+        metricsManager = new ChunkMetricsManager(this);
+        farmController = new FarmController(this);
+        performanceMonitor = new PerformanceMonitor(this);
 
         registerListeners();
         registerCommands();
-        startTasks();
+        performanceMonitor.start();
 
-        getLogger().info("PerformancePlus habilitado! Monitorando a performance do servidor...");
+        getLogger().info("PerformancePlus habilitado: proteção adaptativa e limites controlados pelo config.yml.");
     }
 
     @Override
     public void onDisable() {
-        if (performanceMonitor != null) {
-            performanceMonitor.stop();
-        }
+        if (performanceMonitor != null) performanceMonitor.stop();
+        instance = null;
         getLogger().info("PerformancePlus desabilitado.");
     }
 
     private void registerListeners() {
         PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(metricsManager, this);
         pm.registerEvents(new MobLimiter(this), this);
         pm.registerEvents(new SpawnerLimiter(this), this);
         pm.registerEvents(new EntityLimiter(this), this);
@@ -65,68 +62,39 @@ public class PerformancePlus extends JavaPlugin {
         pm.registerEvents(new XPLimiter(this), this);
         pm.registerEvents(new RedstoneLimiter(this), this);
         pm.registerEvents(new HopperLimiter(this), this);
-        pm.registerEvents(pistonController, this);
-        pm.registerEvents(observerController, this);
+        pm.registerEvents(new PistonController(this), this);
+        pm.registerEvents(new ObserverController(this), this);
         pm.registerEvents(new ChunkGenerationController(this), this);
+        pm.registerEvents(farmController, this);
     }
 
     private void registerCommands() {
-        PerformancePlusCommand cmd = new PerformancePlusCommand(this);
+        PerformancePlusCommand commandExecutor = new PerformancePlusCommand(this);
         PluginCommand command = getCommand("performanceplus");
         if (command != null) {
-            command.setExecutor(cmd);
-            command.setTabCompleter(cmd);
-        } else {
-            getLogger().warning("Não foi possível registrar o comando 'performanceplus'. Verifique o plugin.yml.");
+            command.setExecutor(commandExecutor);
+            command.setTabCompleter(commandExecutor);
         }
 
-        LimitsCommand limitsCommand = new LimitsCommand(this);
-        PluginCommand limits = getCommand("limites");
-        if (limits != null) {
-            limits.setExecutor(limitsCommand);
-            getServer().getPluginManager().registerEvents(limitsCommand, this);
-        } else {
-            getLogger().warning("Não foi possível registrar o comando 'limites'. Verifique o plugin.yml.");
+        LimitsCommand limits = new LimitsCommand(this);
+        PluginCommand limitsCommand = getCommand("limites");
+        if (limitsCommand != null) {
+            limitsCommand.setExecutor(limits);
+            getServer().getPluginManager().registerEvents(limits, this);
         }
     }
 
-    private void startTasks() {
-        this.performanceMonitor = new PerformanceMonitor(this);
-        performanceMonitor.start();
-
-        int interval = configManager.getGlobalInt("settings.check-interval-ticks", 100);
-        new ChunkScanTask(this, farmController).runTaskTimer(this, 100L, Math.max(20, interval));
-    }
-
-    public static PerformancePlus getInstance() {
-        return instance;
-    }
-
-    public ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    public PerformanceMonitor getPerformanceMonitor() {
-        return performanceMonitor;
-    }
-
-    public FarmController getFarmController() {
-        return farmController;
-    }
-
-    public PistonController getPistonController() {
-        return pistonController;
-    }
-
-    public ObserverController getObserverController() {
-        return observerController;
-    }
+    public static PerformancePlus getInstance() { return instance; }
+    public ConfigManager getConfigManager() { return configManager; }
+    public PerformanceMonitor getPerformanceMonitor() { return performanceMonitor; }
+    public ChunkMetricsManager getMetricsManager() { return metricsManager; }
+    public FarmController getFarmController() { return farmController; }
 
     public int getPistonCount(Chunk chunk) {
-        return pistonController.getCount(chunk);
+        return metricsManager.get(chunk).pistons();
     }
 
     public int getObserverCount(Chunk chunk) {
-        return observerController.getCount(chunk);
+        return metricsManager.get(chunk).observers();
     }
 }
