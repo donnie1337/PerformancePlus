@@ -5,97 +5,98 @@ import com.performanceplus.util.MessageUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
-/**
- * Calcula TPS e MSPT manualmente, sem depender de nenhuma API específica
- * do Paper (Bukkit.getTPS() só existe no Paper, não no Spigot puro).
- *
- * A técnica é simples: uma tarefa roda a CADA tick e mede quanto tempo se
- * passou desde o tick anterior (em nanosegundos); a cada 20 ticks (1s),
- * calculamos a média desse período e derivamos o TPS a partir dela.
- */
 public class PerformanceMonitor {
-
     private final PerformancePlus plugin;
-
-    private long lastTickTime = System.nanoTime();
-    private double msptSum = 0;
-    private int tickCount = 0;
-
+    private long lastTickTime;
+    private double msptSum;
+    private int tickCount;
     private volatile double currentTps = 20.0;
     private volatile double currentMspt = 50.0;
+    private volatile int protectionLevel = 0;
+    private long lastWarningAt;
 
     private BukkitTask tickTask;
     private BukkitTask reportTask;
 
-    public PerformanceMonitor(PerformancePlus plugin) {
-        this.plugin = plugin;
-    }
+    public PerformanceMonitor(PerformancePlus plugin) { this.plugin = plugin; }
 
     public void start() {
         lastTickTime = System.nanoTime();
-
         tickTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             long now = System.nanoTime();
-            double deltaMillis = (now - lastTickTime) / 1_000_000.0;
+            double delta = (now - lastTickTime) / 1_000_000.0;
             lastTickTime = now;
-
-            msptSum += deltaMillis;
+            msptSum += delta;
             tickCount++;
         }, 1L, 1L);
 
         reportTask = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             if (tickCount > 0) {
                 currentMspt = msptSum / tickCount;
-                currentTps = Math.min(20.0, 1000.0 / currentMspt);
+                currentTps = Math.min(20.0, 1000.0 / Math.max(1.0, currentMspt));
             }
             msptSum = 0;
             tickCount = 0;
-            checkWarnings();
+            updateProtectionLevel();
+            checkWarning();
         }, 20L, 20L);
     }
 
     public void stop() {
-        if (tickTask != null) {
-            tickTask.cancel();
-        }
-        if (reportTask != null) {
-            reportTask.cancel();
-        }
+        if (tickTask != null) tickTask.cancel();
+        if (reportTask != null) reportTask.cancel();
     }
 
-    public double getTps() {
-        return currentTps;
-    }
+    public double getTps() { return currentTps; }
+    public double getMspt() { return currentMspt; }
+    public int getProtectionLevel() { return protectionLevel; }
 
-    public double getMspt() {
-        return currentMspt;
-    }
+    public boolean isProtectionActive() { return protectionLevel > 0; }
 
-    private void checkWarnings() {
-        if (!plugin.getConfigManager().getGlobalBoolean("monitoring.enabled", true)) {
+    private void updateProtectionLevel() {
+        if (!plugin.getConfigManager().getBoolean("performance.protecao-adaptativa.habilitado", true)) {
+            protectionLevel = 0;
             return;
         }
 
-        double tpsThreshold = plugin.getConfigManager().getGlobalDouble("monitoring.tps-warning-threshold", 18.0);
-        double msptThreshold = plugin.getConfigManager().getGlobalDouble("monitoring.mspt-warning-threshold", 50.0);
+        double level3 = plugin.getConfigManager().getDouble("performance.protecao-adaptativa.niveis.critico.mspt", 100.0);
+        double level2 = plugin.getConfigManager().getDouble("performance.protecao-adaptativa.niveis.alto.mspt", 75.0);
+        double level1 = plugin.getConfigManager().getDouble("performance.protecao-adaptativa.niveis.atencao.mspt", 50.0);
 
-        if (currentTps < tpsThreshold || currentMspt > msptThreshold) {
-            broadcastWarning();
-        }
+        if (currentMspt >= level3) protectionLevel = 3;
+        else if (currentMspt >= level2) protectionLevel = 2;
+        else if (currentMspt >= level1) protectionLevel = 1;
+        else protectionLevel = 0;
     }
 
-    private void broadcastWarning() {
+    public double getLimitMultiplier() {
+        return switch (protectionLevel) {
+            case 3 -> plugin.getConfigManager().getDouble("performance.protecao-adaptativa.niveis.critico.multiplicador-limites", 0.50);
+            case 2 -> plugin.getConfigManager().getDouble("performance.protecao-adaptativa.niveis.alto.multiplicador-limites", 0.75);
+            case 1 -> plugin.getConfigManager().getDouble("performance.protecao-adaptativa.niveis.atencao.multiplicador-limites", 0.90);
+            default -> 1.0;
+        };
+    }
+
+    private void checkWarning() {
+        if (!plugin.getConfigManager().getBoolean("monitoramento.habilitado", true)) return;
+        double threshold = plugin.getConfigManager().getDouble("monitoramento.alerta-mspt", 50.0);
+        if (currentMspt < threshold) return;
+
+        long cooldown = plugin.getConfigManager().getInt("monitoramento.intervalo-alertas-segundos", 30) * 1000L;
+        long now = System.currentTimeMillis();
+        if (now - lastWarningAt < cooldown) return;
+        lastWarningAt = now;
+
+        plugin.getLogger().warning("Performance: TPS=" + String.format("%.2f", currentTps)
+                + " MSPT=" + String.format("%.2f", currentMspt)
+                + " nivel-protecao=" + protectionLevel);
+
+        if (!plugin.getConfigManager().getBoolean("monitoramento.notificar-staff", true)) return;
         String msg = plugin.getConfigManager().getPrefix()
-                + "&eAlerta de performance! TPS: &f" + String.format("%.1f", currentTps)
-                + " &e| MSPT: &f" + String.format("%.1f", currentMspt) + "ms";
-
-        plugin.getLogger().warning("TPS baixo detectado: " + String.format("%.1f", currentTps)
-                + " | MSPT: " + String.format("%.1f", currentMspt) + "ms");
-
-        if (!plugin.getConfigManager().getGlobalBoolean("monitoring.broadcast-to-ops", true)) {
-            return;
-        }
-
+                + "&eProteção de performance nível &f" + protectionLevel
+                + " &e| TPS: &f" + String.format("%.2f", currentTps)
+                + " &e| MSPT: &f" + String.format("%.2f", currentMspt);
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             if (player.hasPermission("performanceplus.notify")) {
                 player.sendMessage(MessageUtil.color(msg));
