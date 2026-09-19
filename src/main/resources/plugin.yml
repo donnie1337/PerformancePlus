@@ -4,6 +4,8 @@ main: com.performanceplus.PerformancePlus
 api-version: '1.21'
 author: donnie1337
 description: Sistema global de proteção, limites e desempenho para servidores Spigot/Bukkit.
+softdepend:
+  - WorldPlus
 
 commands:
   performanceplus:
