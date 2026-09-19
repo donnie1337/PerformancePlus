@@ -37,9 +37,25 @@ public class FarmController implements Listener {
 
     @EventHandler
     public void onEntityRemove(EntityRemoveEvent event) {
-        if (event.getEntity().getLocation().getWorld() != null) {
-            evaluate(event.getEntity().getLocation().getChunk());
-        }
+        /*
+         * EntityRemoveEvent também é disparado durante o descarregamento de
+         * chunks. Nesse momento, chamar Location#getChunk() pode tentar
+         * carregar a própria chunk novamente enquanto o DistanceManager está
+         * processando os unloads. Em 26.x isso pode corromper a iteração
+         * interna do DistanceManager.
+         *
+         * Para remoção, só avaliamos se a chunk já estiver carregada. Nunca
+         * iniciamos um novo carregamento a partir deste evento.
+         */
+        var location = event.getEntity().getLocation();
+        var world = location.getWorld();
+        if (world == null) return;
+
+        int chunkX = location.getBlockX() >> 4;
+        int chunkZ = location.getBlockZ() >> 4;
+        if (!world.isChunkLoaded(chunkX, chunkZ)) return;
+
+        evaluate(world.getChunkAt(chunkX, chunkZ));
     }
 
     @EventHandler
