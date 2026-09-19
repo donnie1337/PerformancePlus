@@ -170,7 +170,7 @@ public final class ChunkMetricsManager implements Listener {
         m.entities = Math.max(0, m.entities - 1);
         if (entity instanceof LivingEntity && !(entity instanceof Player)) m.mobs = Math.max(0, m.mobs - 1);
         switch (entity.getType()) {
-            case DROPPED_ITEM -> m.items = Math.max(0, m.items - 1);
+            case ITEM -> m.items = Math.max(0, m.items - 1);
             case EXPERIENCE_ORB -> m.xpOrbs = Math.max(0, m.xpOrbs - 1);
             case HOPPER_MINECART -> m.hopperMinecarts = Math.max(0, m.hopperMinecarts - 1);
             default -> { }
