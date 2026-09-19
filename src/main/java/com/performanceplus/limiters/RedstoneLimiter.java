@@ -2,42 +2,52 @@ package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.util.ChunkUtils;
-import com.performanceplus.util.CooldownTracker;
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockRedstoneEvent;
 
-/**
- * Limita atualizações de redstone por chunk usando uma janela curta,
- * aproximando um tick (50 ms). A configuração continua expressa em
- * atualizações por chunk por tick; não há mais a conversão incorreta para
- * "valor x 20 por segundo".
- */
-public class RedstoneLimiter implements Listener {
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+public class RedstoneLimiter implements Listener {
     private final PerformancePlus plugin;
-    private final CooldownTracker tracker = new CooldownTracker(50L);
+    private final Map<String, Integer> counts = new ConcurrentHashMap<>();
+    private long tick = -1L;
 
     public RedstoneLimiter(PerformancePlus plugin) {
         this.plugin = plugin;
+        plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            counts.clear();
+            tick = Bukkit.getCurrentTick();
+        }, 1L, 1L);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = false)
     public void onRedstone(BlockRedstoneEvent event) {
         Chunk chunk = event.getBlock().getChunk();
-        if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())) {
-            return;
+        if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())
+                || !plugin.getConfigManager().isLimitEnabled("redstone")) return;
+
+        int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "redstone-por-chunk-por-tick", 25);
+        if (limit <= 0) return;
+
+        long currentTick = Bukkit.getCurrentTick();
+        if (currentTick != tick) {
+            counts.clear();
+            tick = currentTick;
         }
 
-        int perTickLimit = plugin.getConfigManager().getLimit(
-                chunk.getWorld(), "redstone-updates-per-chunk-per-tick", 25);
-        if (perTickLimit <= 0) {
-            return;
-        }
+        String key = ChunkUtils.key(chunk);
+        int count = counts.merge(key, 1, Integer::sum);
+        if (count <= limit) return;
 
-        int count = tracker.registerAndCount(ChunkUtils.key(chunk));
-        if (count > perTickLimit) {
+        String action = plugin.getConfigManager().raw().getString(
+                "limites.redstone.acao-quando-exceder", "bloquear-atualizacao");
+
+        if ("bloquear-atualizacao".equalsIgnoreCase(action)) {
             event.setNewCurrent(event.getOldCurrent());
         }
     }
