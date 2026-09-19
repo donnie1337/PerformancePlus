@@ -13,8 +13,8 @@
     <description>Plugin de controle e otimização de performance para servidores Spigot/Bukkit.</description>
 
     <properties>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>26</maven.compiler.source>
+        <maven.compiler.target>26</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <!--
@@ -45,6 +45,6 @@
 
     <build>
         <finalName>${project.artifactId}</finalName>
-        <defaultGoal>clean package</defaultGoal>
+        <defaultGoal>package</defaultGoal>
     </build>
 </project>
