@@ -180,7 +180,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             Material material = resolveSpawnEgg(mob);
             String defaultTitle = "&f" + formatMobName(mob);
             List<String> defaultLore = List.of("&7Limite: &fNão configurado", "&7Raio: &fNão configurado", "", "&8Configuração individual por criatura.");
-            inventory.setItem(slot, createConfiguredItem(itemPath, material, mob, defaultLore, -1, defaultTitle));
+            inventory.setItem(slot, createCreatureItem(itemPath, material, defaultLore, defaultTitle));
         }
 
         if (page > 0) setNavigation(inventory, "criaturas", "pagina-anterior");
@@ -188,6 +188,25 @@ public class LimitsCommand implements CommandExecutor, Listener {
         if (end < category.mobs.size()) setNavigation(inventory, "criaturas", "proxima-pagina");
 
         player.openInventory(inventory);
+    }
+
+    private ItemStack createCreatureItem(String itemPath, Material material, List<String> fallbackLore, String fallbackTitle) {
+        String defaultPath = "criatura-itens.padrao";
+        Material configuredMaterial = guiMaterial(itemPath, "material", guiMaterial(defaultPath, "material", material));
+        String title = guiString(itemPath, "titulo", guiString(defaultPath, "titulo", fallbackTitle));
+        List<String> lore = guiLore(itemPath, "lore", guiLore(defaultPath, "lore", fallbackLore));
+        List<String> parsedLore = new ArrayList<>();
+        for (String line : lore) {
+            parsedLore.add(color(line));
+        }
+        ItemStack item = new ItemStack(configuredMaterial);
+        ItemMeta meta = item.getItemMeta();
+        if (meta != null) {
+            meta.setDisplayName(color(title));
+            meta.setLore(parsedLore);
+            item.setItemMeta(meta);
+        }
+        return item;
     }
 
     private ItemStack createConfiguredItem(String path, Material fallbackMaterial, String key, List<String> fallbackLore, int limit) {
