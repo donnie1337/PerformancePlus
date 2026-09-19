@@ -2,7 +2,6 @@ package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.util.ChunkUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -15,13 +14,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RedstoneLimiter implements Listener {
     private final PerformancePlus plugin;
     private final Map<String, Integer> counts = new ConcurrentHashMap<>();
-    private long tick = -1L;
+    private long tick = 0L;
 
     public RedstoneLimiter(PerformancePlus plugin) {
         this.plugin = plugin;
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             counts.clear();
-            tick = Bukkit.getCurrentTick();
+            tick++;
         }, 1L, 1L);
     }
 
@@ -34,7 +33,7 @@ public class RedstoneLimiter implements Listener {
         int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "redstone-por-chunk-por-tick", 25);
         if (limit <= 0) return;
 
-        long currentTick = Bukkit.getCurrentTick();
+        long currentTick = tick;
         if (currentTick != tick) {
             counts.clear();
             tick = currentTick;
