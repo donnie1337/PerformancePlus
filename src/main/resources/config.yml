@@ -38,7 +38,7 @@ limites:
 
   pistoes:
     habilitado: true
-    valor: 12
+    valor: 10
 
   pistoes-ativacoes-por-segundo:
     habilitado: true
@@ -46,7 +46,7 @@ limites:
 
   observers:
     habilitado: true
-    valor: 12
+    valor: 10
 
   redstone:
     habilitado: true
