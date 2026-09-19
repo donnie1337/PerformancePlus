@@ -34,7 +34,7 @@ limites:
 
   spawners:
     habilitado: true
-    valor: 4
+    valor: 2
 
   pistoes:
     habilitado: true
