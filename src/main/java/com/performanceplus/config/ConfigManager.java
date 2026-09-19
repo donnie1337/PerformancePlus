@@ -20,8 +20,9 @@ public class ConfigManager {
     public void reload() { plugin.reloadConfig(); }
 
     public int getLimit(World world, String key, int def) {
-        String path = "limites." + key;
+        String path = "limites." + key + ".valor";
         String worldPath = "mundos." + world.getName() + ".limites." + key;
+        String worldValuePath = worldPath + ".valor";
         FileConfiguration cfg = raw();
         return cfg.contains(worldPath) ? cfg.getInt(worldPath, def) : cfg.getInt(path, def);
     }
