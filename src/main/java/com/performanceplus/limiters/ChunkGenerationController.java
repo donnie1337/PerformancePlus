@@ -1,8 +1,6 @@
 package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
-import com.performanceplus.util.ChunkUtils;
-import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -24,7 +22,10 @@ public class ChunkGenerationController implements Listener {
     public void onChunkLoad(ChunkLoadEvent event) {
         if (!event.isNewChunk() || plugin.getConfigManager().isWorldIgnored(event.getWorld())) return;
 
-        if (!plugin.getConfigManager().isLimitEnabled("chunks-gerados-por-segundo")) return;
+        // Respeita tanto o limite global quanto uma configuração específica do mundo.
+        // Isso permite que mundos criados/carregados pelo WorldPlus usem suas próprias regras.
+        if (!plugin.getConfigManager().isLimitEnabled(event.getWorld(), "chunks-gerados-por-segundo")) return;
+
         int limit = plugin.getConfigManager().getLimit(event.getWorld(), "chunks-gerados-por-segundo", 20);
         if (limit <= 0) return;
 
