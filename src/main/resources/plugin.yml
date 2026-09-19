@@ -2,37 +2,37 @@ name: PerformancePlus
 version: '1.0.0'
 main: com.performanceplus.PerformancePlus
 api-version: '1.21'
-author: SeuNome
-description: Plugin de controle e otimização de performance para servidores Spigot/Bukkit.
+author: donnie1337
+description: Sistema global de proteção, limites e desempenho para servidores Spigot/Bukkit.
 
 commands:
   performanceplus:
-    description: Comando principal do PerformancePlus
+    description: Comando de diagnóstico do PerformancePlus
     aliases: [pperf, pp]
-    usage: /<command> [status|chunk|farms|recount|reload|help]
+    usage: /<command> [status|chunk|farms|reload|help]
   limites:
     description: Mostra os limites ativos do servidor
     usage: /limites
 
 permissions:
   performanceplus.admin:
-    description: Acesso total aos comandos administrativos (reload, recount)
+    description: Permite recarregar a configuração do PerformancePlus
     default: op
   performanceplus.notify:
-    description: Recebe alertas de performance (TPS/MSPT baixos, geração de chunks)
+    description: Recebe alertas de performance
     default: op
   performanceplus.notify.farms:
-    description: Recebe alertas de chunks sinalizados como possíveis farms
+    description: Recebe alertas de áreas de alta concentração
     default: op
   performanceplus.bypass.spawners:
-    description: Ignora o limite de spawners por chunk
+    description: Ignora o limite de spawners
     default: op
   performanceplus.bypass.hoppers:
-    description: Ignora o limite de hoppers por chunk
+    description: Ignora o limite de hoppers
     default: op
-  performanceplus.bypass.pistons:
-    description: Ignora o limite de pistões por chunk
+  performanceplus.bypass.pistoes:
+    description: Ignora o limite de pistões
     default: op
   performanceplus.bypass.observers:
-    description: Ignora o limite de observers por chunk
+    description: Ignora o limite de observers
     default: op
