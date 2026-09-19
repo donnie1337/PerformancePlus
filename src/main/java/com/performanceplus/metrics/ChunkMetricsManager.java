@@ -23,12 +23,14 @@ import org.bukkit.event.world.EntitiesLoadEvent;
 import org.bukkit.event.world.EntitiesUnloadEvent;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public final class ChunkMetricsManager implements Listener {
 
     private final PerformancePlus plugin;
     private final Map<String, Metrics> metrics = new ConcurrentHashMap<>();
+    private final Map<UUID, String> entityLocations = new ConcurrentHashMap<>();
 
     public ChunkMetricsManager(PerformancePlus plugin) {
         this.plugin = plugin;
@@ -54,7 +56,9 @@ public final class ChunkMetricsManager implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChunkUnload(ChunkUnloadEvent event) {
-        metrics.remove(ChunkUtils.key(event.getChunk()));
+        String key = ChunkUtils.key(event.getChunk());
+        metrics.remove(key);
+        entityLocations.entrySet().removeIf(entry -> key.equals(entry.getValue()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -64,7 +68,7 @@ public final class ChunkMetricsManager implements Listener {
         }
         Metrics m = get(event.getChunk());
         for (Entity entity : event.getEntities()) {
-            addEntity(m, entity);
+            addEntity(m, entity, ChunkUtils.key(event.getChunk()));
         }
     }
 
@@ -73,7 +77,7 @@ public final class ChunkMetricsManager implements Listener {
         Metrics m = getIfPresent(event.getChunk());
         if (m == null) return;
         for (Entity entity : event.getEntities()) {
-            removeEntity(m, entity);
+            removeEntity(m, entity, ChunkUtils.key(event.getChunk()));
         }
     }
 
@@ -83,7 +87,7 @@ public final class ChunkMetricsManager implements Listener {
                 || plugin.getConfigManager().isWorldIgnored(event.getLocation().getWorld())) {
             return;
         }
-        addEntity(get(event.getLocation().getChunk()), event.getEntity());
+        addEntity(get(event.getLocation().getChunk()), event.getEntity(), ChunkUtils.key(event.getLocation().getChunk()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -92,8 +96,10 @@ public final class ChunkMetricsManager implements Listener {
         if (entity.getType() == EntityType.PLAYER || entity.getLocation().getWorld() == null) {
             return;
         }
-        Metrics m = getIfPresent(entity.getLocation().getChunk());
-        if (m != null) removeEntity(m, entity);
+        String key = entityLocations.remove(entity.getUniqueId());
+        if (key == null) return;
+        Metrics m = metrics.get(key);
+        if (m != null) removeEntity(m, entity, key);
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -108,10 +114,11 @@ public final class ChunkMetricsManager implements Listener {
         Chunk to = event.getTo().getChunk();
         if (ChunkUtils.key(from).equals(ChunkUtils.key(to))) return;
 
-        Metrics source = getIfPresent(from);
-        if (source != null) removeEntity(source, entity);
+        String oldKey = entityLocations.remove(entity.getUniqueId());
+        Metrics source = oldKey == null ? getIfPresent(from) : metrics.get(oldKey);
+        if (source != null) removeEntity(source, entity, oldKey == null ? ChunkUtils.key(from) : oldKey);
         if (!plugin.getConfigManager().isWorldIgnored(to.getWorld())) {
-            addEntity(get(to), entity);
+            addEntity(get(to), entity, ChunkUtils.key(to));
         }
     }
 
@@ -155,7 +162,9 @@ public final class ChunkMetricsManager implements Listener {
         }
     }
 
-    private void addEntity(Metrics m, Entity entity) {
+    private void addEntity(Metrics m, Entity entity, String chunkKey) {
+        if (entity.getType() == EntityType.PLAYER) return;
+        if (entityLocations.putIfAbsent(entity.getUniqueId(), chunkKey) != null) return;
         m.entities++;
         if (entity instanceof LivingEntity && !(entity instanceof Player)) m.mobs++;
         switch (entity.getType()) {
@@ -166,7 +175,10 @@ public final class ChunkMetricsManager implements Listener {
         }
     }
 
-    private void removeEntity(Metrics m, Entity entity) {
+    private void removeEntity(Metrics m, Entity entity, String chunkKey) {
+        String tracked = entityLocations.get(entity.getUniqueId());
+        if (tracked != null && chunkKey != null && !tracked.equals(chunkKey)) return;
+        entityLocations.remove(entity.getUniqueId(), tracked);
         m.entities = Math.max(0, m.entities - 1);
         if (entity instanceof LivingEntity && !(entity instanceof Player)) m.mobs = Math.max(0, m.mobs - 1);
         switch (entity.getType()) {
