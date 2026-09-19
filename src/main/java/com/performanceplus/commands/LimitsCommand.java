@@ -138,7 +138,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
                     List.of("&7Limite: &f{limite}", "&7Por chunk"), currentLimit(player, key)));
         }
 
-        setNavigation(inventory, "voltar");
+        setNavigation(inventory, page, "voltar");
         player.openInventory(inventory);
     }
 
@@ -183,9 +183,9 @@ public class LimitsCommand implements CommandExecutor, Listener {
             inventory.setItem(slot, createConfiguredItem(itemPath, material, mob, defaultLore, -1, defaultTitle));
         }
 
-        if (page > 0) setNavigation(inventory, "pagina-anterior");
-        setNavigation(inventory, "voltar");
-        if (end < category.mobs.size()) setNavigation(inventory, "proxima-pagina");
+        if (page > 0) setNavigation(inventory, "criaturas", "pagina-anterior");
+        setNavigation(inventory, "criaturas", "voltar");
+        if (end < category.mobs.size()) setNavigation(inventory, "criaturas", "proxima-pagina");
 
         player.openInventory(inventory);
     }
@@ -214,9 +214,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
         return item;
     }
 
-    private void setNavigation(Inventory inventory, String key) {
-        String path = "navegacao." + key;
-        int slot = guiInt(path, "slot", key.equals("voltar") ? 49 : key.equals("pagina-anterior") ? 21 : 23);
+    private void setNavigation(Inventory inventory, String page, String key) {
+        String specificPath = "navegacao." + page + "." + key;
+        String path = gui(specificPath) != null ? specificPath : "navegacao." + key;
+        int slot = guiInt(path, "slot", key.equals("voltar") ? (inventory.getSize() - 5) : key.equals("pagina-anterior") ? 21 : 23);
         if (slot < 0 || slot >= inventory.getSize()) return;
         Material material = guiMaterial(path, "material", Material.ARROW);
         String title = guiString(path, "titulo", "&fVoltar");
@@ -356,21 +357,21 @@ public class LimitsCommand implements CommandExecutor, Listener {
         }
 
         if (isLimitPageTitle(title, "redstone") || isLimitPageTitle(title, "geradores") || isLimitPageTitle(title, "decoracoes")) {
-            if (slot == guiInt("navegacao.voltar", "slot", 49)) openMain(player);
+            if (slot == guiInt("navegacao.redstone.voltar", "slot", guiInt("navegacao.voltar", "slot", 49)) || slot == guiInt("navegacao.geradores.voltar", "slot", guiInt("navegacao.voltar", "slot", 49)) || slot == guiInt("navegacao.decoracoes.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))) openMain(player);
             return;
         }
 
         CreatureCategory creatureCategory = findCreatureCategory(title);
         if (creatureCategory != null) {
-            if (slot == guiInt("navegacao.voltar", "slot", 49)) {
+            if (slot == guiInt("navegacao.criaturas.voltar", "slot", 22) || slot == guiInt("navegacao.voltar", "slot", 49)) {
                 openCreatureCategories(player);
                 return;
             }
-            if (slot == guiInt("navegacao.pagina-anterior", "slot", 21)) {
+            if (slot == guiInt("navegacao.criaturas.pagina-anterior", "slot", 21)) {
                 openCreaturePage(player, creatureCategory, 0);
                 return;
             }
-            if (slot == guiInt("navegacao.proxima-pagina", "slot", 23)) {
+            if (slot == guiInt("navegacao.criaturas.proxima-pagina", "slot", 23)) {
                 openCreaturePage(player, creatureCategory, 1);
             }
         }
