@@ -2,7 +2,7 @@ package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.metrics.ChunkMetricsManager.Metrics;
-import com.performanceplus.util.MessageUtil;
+import com.performanceplus.util.MessageManager;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
@@ -11,6 +11,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
+
+import java.util.Map;
 
 public class HopperLimiter implements Listener {
     private final PerformancePlus plugin;
@@ -31,8 +33,8 @@ public class HopperLimiter implements Listener {
         Metrics metrics = plugin.getMetricsManager().get(chunk);
         if (metrics.hoppers() >= limit) {
             event.setCancelled(true);
-            MessageUtil.send(player, plugin.getConfigManager().getPrefix(),
-                    "&cLimite de &f" + limit + " &chopper(s) por chunk atingido.");
+            plugin.getMessageManager().send(player, "limites.hoppers",
+                    Map.of("{limite}", String.valueOf(limit)));
         }
     }
 
