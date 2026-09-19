@@ -16,33 +16,80 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Roda periodicamente (intervalo configurável) sobre todos os chunks
- * carregados para:
- *  1) opcionalmente limpar itens dropados e orbes de XP excedentes
- *     (nunca mobs, para não arriscar matar animais/pets por engano);
- *  2) alimentar o FarmController com as contagens usadas na detecção
- *     heurística de farms automáticas.
+ * Varredura de farms/limpeza distribuída em pequenos lotes.
+ *
+ * A versão anterior varria TODOS os chunks carregados de uma vez a cada
+ * intervalo, o que podia criar picos de MSPT em servidores grandes.
+ * Agora os chunks são processados em lotes por tick. O intervalo continua
+ * controlando a frequência de uma varredura completa.
  */
 public class ChunkScanTask extends BukkitRunnable {
 
     private final PerformancePlus plugin;
     private final FarmController farmController;
 
+    private final List<Chunk> queue = new ArrayList<>();
+    private int queueIndex;
+    private long nextScanAt;
+
     public ChunkScanTask(PerformancePlus plugin, FarmController farmController) {
         this.plugin = plugin;
         this.farmController = farmController;
+        this.nextScanAt = System.currentTimeMillis();
     }
 
     @Override
     public void run() {
+        long now = System.currentTimeMillis();
+
+        if (queueIndex >= queue.size()) {
+            if (now < nextScanAt) {
+                return;
+            }
+            rebuildQueue();
+            if (queue.isEmpty()) {
+                nextScanAt = now + getIntervalMillis();
+                return;
+            }
+        }
+
+        int budget = Math.max(1, plugin.getConfigManager()
+                .getGlobalInt("settings.scan-chunks-per-tick", 25));
+
+        int processed = 0;
+        while (queueIndex < queue.size() && processed < budget) {
+            Chunk chunk = queue.get(queueIndex++);
+            if (chunk.isLoaded() && !plugin.getConfigManager().isWorldIgnored(chunk.getWorld())) {
+                scanChunk(chunk);
+            }
+            processed++;
+        }
+
+        if (queueIndex >= queue.size()) {
+            queue.clear();
+            queueIndex = 0;
+            nextScanAt = System.currentTimeMillis() + getIntervalMillis();
+        }
+    }
+
+    private void rebuildQueue() {
+        queue.clear();
+        queueIndex = 0;
+
         for (World world : plugin.getServer().getWorlds()) {
             if (plugin.getConfigManager().isWorldIgnored(world)) {
                 continue;
             }
             for (Chunk chunk : world.getLoadedChunks()) {
-                scanChunk(chunk);
+                queue.add(chunk);
             }
         }
+    }
+
+    private long getIntervalMillis() {
+        int ticks = Math.max(20, plugin.getConfigManager()
+                .getGlobalInt("settings.check-interval-ticks", 100));
+        return ticks * 50L;
     }
 
     private void scanChunk(Chunk chunk) {
