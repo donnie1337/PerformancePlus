@@ -46,6 +46,7 @@ public final class ChunkMetricsManager implements Listener {
     public void onChunkLoad(ChunkLoadEvent event) {
         if (!plugin.getConfigManager().isWorldIgnored(event.getWorld())) {
             get(event.getChunk());
+            initializeBlocks(event.getChunk());
         }
     }
 
