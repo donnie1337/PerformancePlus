@@ -18,7 +18,7 @@ limites:
 
   entidades:
     habilitado: true
-    valor: 100
+    valor: 6
 
   itens:
     habilitado: true
