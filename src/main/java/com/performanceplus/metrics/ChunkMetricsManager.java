@@ -5,6 +5,9 @@ import com.performanceplus.util.ChunkUtils;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
+import org.bukkit.NamespacedKey;
+import org.bukkit.block.TileState;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -31,9 +34,11 @@ public final class ChunkMetricsManager implements Listener {
     private final PerformancePlus plugin;
     private final Map<String, Metrics> metrics = new ConcurrentHashMap<>();
     private final Map<UUID, String> entityLocations = new ConcurrentHashMap<>();
+    private final NamespacedKey placedSpawnerKey;
 
     public ChunkMetricsManager(PerformancePlus plugin) {
         this.plugin = plugin;
+        this.placedSpawnerKey = new NamespacedKey(plugin, "placed_spawner");
     }
 
     public Metrics get(Chunk chunk) {
@@ -128,8 +133,29 @@ public final class ChunkMetricsManager implements Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    public void onSpawnerPlace(BlockPlaceEvent event) {
+        if (event.getBlock().getType() != Material.SPAWNER) return;
+        Chunk chunk = event.getBlock().getChunk();
+        if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())) return;
+
+        BlockState state = event.getBlock().getState();
+        if (!(state instanceof TileState tile)) return;
+        tile.getPersistentDataContainer().set(placedSpawnerKey, PersistentDataType.BYTE, (byte) 1);
+        tile.update(true, false);
+        get(chunk).spawners++;
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        adjustBlock(event.getBlock().getChunk(), event.getBlock().getType(), -1);
+        Chunk chunk = event.getBlock().getChunk();
+        if (event.getBlock().getType() == Material.SPAWNER) {
+            if (isPlacedSpawner(event.getBlock().getState())) {
+                Metrics m = get(chunk);
+                m.spawners = Math.max(0, m.spawners - 1);
+            }
+            return;
+        }
+        adjustBlock(chunk, event.getBlock().getType(), -1);
     }
 
     private void adjustBlock(Chunk chunk, Material material, int delta) {
@@ -154,7 +180,9 @@ public final class ChunkMetricsManager implements Listener {
         for (BlockState state : chunk.getTileEntities()) {
             switch (state.getType()) {
                 case HOPPER -> m.hoppers++;
-                case SPAWNER -> m.spawners++;
+                case SPAWNER -> {
+                    if (isPlacedSpawner(state)) m.spawners++;
+                }
                 case PISTON, STICKY_PISTON -> m.pistons++;
                 case OBSERVER -> m.observers++;
                 default -> { }
