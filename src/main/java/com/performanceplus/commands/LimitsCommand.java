@@ -13,6 +13,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryDragEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -27,17 +28,17 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private final PerformancePlus plugin;
 
     private static final LimitEntry[] LIMITS = {
-            new LimitEntry("mobs-per-chunk", "Mobs por chunk", Material.ZOMBIE_HEAD),
-            new LimitEntry("spawners-per-chunk", "Spawners por chunk", Material.SPAWNER),
-            new LimitEntry("entities-per-chunk", "Entidades por chunk", Material.ARMOR_STAND),
-            new LimitEntry("items-per-chunk", "Itens por chunk", Material.DIAMOND),
-            new LimitEntry("xp-orbs-per-chunk", "Orbes de XP por chunk", Material.EXPERIENCE_BOTTLE),
-            new LimitEntry("hoppers-per-chunk", "Hoppers por chunk", Material.HOPPER),
-            new LimitEntry("redstone-updates-per-chunk-per-tick", "Redstone por chunk/tick", Material.REDSTONE),
-            new LimitEntry("pistons-per-chunk", "Pistões por chunk", Material.PISTON),
-            new LimitEntry("piston-activations-per-second", "Ativações de pistão/segundo", Material.PISTON),
-            new LimitEntry("observers-per-chunk", "Observers por chunk", Material.OBSERVER),
-            new LimitEntry("max-chunks-generated-per-second", "Chunks gerados/segundo", Material.MAP)
+            new LimitEntry("mobs", "Mobs por chunk", Material.ZOMBIE_HEAD),
+            new LimitEntry("spawners", "Spawners por chunk", Material.SPAWNER),
+            new LimitEntry("entidades", "Entidades por chunk", Material.ARMOR_STAND),
+            new LimitEntry("itens", "Itens por chunk", Material.DIAMOND),
+            new LimitEntry("xp-orbes", "Orbes de XP por chunk", Material.EXPERIENCE_BOTTLE),
+            new LimitEntry("hoppers", "Hoppers por chunk", Material.HOPPER),
+            new LimitEntry("redstone", "Redstone por chunk/tick", Material.REDSTONE),
+            new LimitEntry("pistoes", "Pistões por chunk", Material.PISTON),
+            new LimitEntry("pistoes-ativacoes-por-segundo", "Ativações de pistão/segundo", Material.PISTON),
+            new LimitEntry("observers", "Observers por chunk", Material.OBSERVER),
+            new LimitEntry("chunks-gerados-por-segundo", "Chunks gerados/segundo", Material.MAP)
     };
 
     public LimitsCommand(PerformancePlus plugin) {
@@ -64,7 +65,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             LimitEntry entry = LIMITS[i];
             int value = plugin.getConfigManager().getLimit(world, entry.key, 0);
             boolean override = plugin.getConfigManager().raw()
-                    .contains("worlds." + world.getName() + ".limits." + entry.key);
+                    .contains("mundos." + world.getName() + ".limites." + entry.key);
 
             List<String> lore = new ArrayList<>();
             lore.add("§7Valor atual: §f" + formatValue(value));
@@ -72,7 +73,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             lore.add(override ? "§eValor específico deste mundo"
                     : "§8Usando o limite global");
             lore.add("");
-            lore.add("§8• §7Configurado em §fconfig.yml");
+            lore.add("§8• §7Controlado pelo §fconfig.yml");
 
             ItemStack item = new ItemStack(entry.material);
             ItemMeta meta = item.getItemMeta();
@@ -109,6 +110,11 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private String formatValue(int value) {
         return value <= 0 ? "Desativado" : String.valueOf(value);
+    }
+
+    @EventHandler
+    public void onInventoryDrag(InventoryDragEvent event) {
+        if (TITLE.equals(event.getView().getTitle())) event.setCancelled(true);
     }
 
     @EventHandler
