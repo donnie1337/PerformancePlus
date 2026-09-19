@@ -1,0 +1,96 @@
+# ============================================================
+# PerformancePlus - todas as mensagens do plugin
+# ============================================================
+# Cores: &0-&9, &a-&f
+# Você pode alterar livremente os textos e as cores.
+#
+# Placeholders disponíveis:
+# {prefixo} {valor} {mundo} {x} {z} {score} {tps} {mspt}
+# {nivel} {limite}
+
+prefixo: "&8[&b&lPerformance&f&lPlus&8] &7"
+
+plugin:
+  habilitado: "&aPerformancePlus habilitado: proteção adaptativa e limites carregados."
+  desabilitado: "&cPerformancePlus desabilitado."
+
+comandos:
+  sem-permissao: "&cVocê não tem permissão para isso."
+  config-recarregada: "&aConfiguração e mensagens recarregadas com sucesso."
+  apenas-jogador: "&cEste comando só pode ser usado por jogadores."
+
+  status:
+    titulo: "&f--- &bPerformancePlus &f---"
+    tps: "&7TPS: &f{tps}"
+    mspt: "&7MSPT: &f{mspt}"
+    nivel: "&7Nível de proteção: &f{nivel}"
+    chunks-monitorados: "&7Chunks monitorados: &f{valor}"
+    chunks-sinalizados: "&7Chunks sinalizados: &f{valor}"
+
+  chunk:
+    titulo: "&f--- &bChunk &f({x}, {z}) &f---"
+    mobs: "&7Mobs: &f{valor}"
+    entidades: "&7Entidades: &f{valor}"
+    itens: "&7Itens: &f{valor}"
+    xp: "&7XP: &f{valor}"
+    hoppers: "&7Hoppers: &f{valor}"
+    spawners: "&7Spawners: &f{valor}"
+    pistoes: "&7Pistões: &f{valor}"
+    observers: "&7Observers: &f{valor}"
+
+  farms:
+    nenhum: "&aNenhum chunk de alta concentração detectado."
+    titulo: "&f--- &bChunks sinalizados &f---"
+    item: "&7• &f{valor}"
+
+  ajuda:
+    status: "&f/pperf status &7- Status de performance"
+    chunk: "&f/pperf chunk &7- Limites e contadores do chunk atual"
+    farms: "&f/pperf farms &7- Chunks com alta concentração"
+    reload: "&f/pperf reload &7- Recarrega o config.yml e mensagens.yml"
+
+limites:
+  entidades: "&cLimite de entidades deste chunk atingido."
+  hoppers: "&cLimite de &f{limite} &chopper(s) por chunk atingido."
+  spawners: "&cLimite de &f{limite} &cspawner(s) por chunk atingido."
+  pistoes: "&cLimite de &f{limite} &cpistão(ões) por chunk atingido."
+  observers: "&cLimite de &f{limite} &cobserver(s) por chunk atingido."
+
+farm:
+  staff: "&eChunk com alta concentração de recursos: &f{mundo} {x},{z} &7(pontuação {score})."
+  console: "Chunk de alta concentração: {mundo}:{x},{z} score={score}"
+
+performance:
+  staff: "&eProteção de performance nível &f{nivel} &e| TPS: &f{tps} &e| MSPT: &f{mspt}"
+  console: "Performance: TPS={tps} MSPT={mspt} nivel-protecao={nivel}"
+
+chunks:
+  console: "Geração de chunks acima do limite configurado em {mundo}: {limite}/s."
+  staff: "&eGeração de chunks acima do limite configurado."
+
+gui:
+  titulo: "&8&lLimites do servidor"
+  limite:
+    mobs: "Mobs por chunk"
+    spawners: "Spawners por chunk"
+    entidades: "Entidades por chunk"
+    itens: "Itens por chunk"
+    xp-orbes: "Orbes de XP por chunk"
+    hoppers: "Hoppers por chunk"
+    redstone: "Redstone por chunk/tick"
+    pistoes: "Pistões por chunk"
+    pistoes-ativacoes-por-segundo: "Ativações de pistão/segundo"
+    observers: "Observers por chunk"
+    chunks-gerados-por-segundo: "Chunks gerados/segundo"
+  lore:
+    valor: "&7Valor atual: &f{valor}"
+    mundo: "&7Mundo: &f{mundo}"
+    override: "&eValor específico deste mundo"
+    global: "&8Usando o limite global"
+    controlado: "&8• &7Controlado pelo &fconfig.yml"
+  info:
+    nome: "&f&lInformações"
+    linha1: "&7Estes são os limites ativos no seu mundo."
+    linha2: "&7Limites específicos do mundo têm prioridade"
+    linha3: "&7sobre os valores globais do config.yml."
+    comando: "&8• &7Comando: &f/limites"
