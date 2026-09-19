@@ -2,7 +2,7 @@ package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.metrics.ChunkMetricsManager.Metrics;
-import com.performanceplus.util.MessageUtil;
+import com.performanceplus.util.MessageManager;
 import org.bukkit.Chunk;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -13,6 +13,8 @@ import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.hanging.HangingPlaceEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
+
+import java.util.Map;
 
 public class EntityLimiter implements Listener {
     private final PerformancePlus plugin;
@@ -50,8 +52,7 @@ public class EntityLimiter implements Listener {
         if (metrics.entities() >= limit) {
             event.setCancelled(true);
             if (player != null) {
-                MessageUtil.send(player, plugin.getConfigManager().getPrefix(),
-                        "&cLimite de entidades deste chunk atingido.");
+                plugin.getMessageManager().send(player, "limites.entidades", Map.of("{limite}", String.valueOf(limit)));
             }
         }
     }
