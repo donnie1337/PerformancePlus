@@ -30,7 +30,7 @@ limites:
 
   hoppers:
     habilitado: true
-    valor: 8
+    valor: 20
 
   spawners:
     habilitado: true
