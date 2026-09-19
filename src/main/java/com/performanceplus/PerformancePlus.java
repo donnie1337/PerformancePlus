@@ -1,5 +1,6 @@
 package com.performanceplus;
 
+import com.performanceplus.commands.LimitsCommand;
 import com.performanceplus.commands.PerformancePlusCommand;
 import com.performanceplus.config.ConfigManager;
 import com.performanceplus.limiters.ChunkGenerationController;
@@ -77,6 +78,15 @@ public class PerformancePlus extends JavaPlugin {
             command.setTabCompleter(cmd);
         } else {
             getLogger().warning("Não foi possível registrar o comando 'performanceplus'. Verifique o plugin.yml.");
+        }
+
+        LimitsCommand limitsCommand = new LimitsCommand(this);
+        PluginCommand limits = getCommand("limites");
+        if (limits != null) {
+            limits.setExecutor(limitsCommand);
+            getServer().getPluginManager().registerEvents(limitsCommand, this);
+        } else {
+            getLogger().warning("Não foi possível registrar o comando 'limites'. Verifique o plugin.yml.");
         }
     }
 
