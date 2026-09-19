@@ -69,6 +69,22 @@ chunks:
   staff: "&eGeração de chunks acima do limite configurado."
 
 gui:
+  categorias:
+    redstone: "&c&lRedstone"
+    criaturas: "&a&lCriaturas"
+    geradores: "&5&lGeradores"
+    decoracoes: "&e&lDecorações"
+  criaturas:
+    animais-terrestres: "&a&lAnimais terrestres"
+    animais-aquaticos: "&b&lAnimais aquáticos"
+    monstros-comuns: "&c&lMonstros comuns"
+    nether: "&4&lNether"
+    end: "&5&lEnd"
+    pillagers: "&6&lPillagers"
+    aldeoes-traders: "&e&lAldeões e Traders"
+    cavalos-especiais: "&b&lCavalos especiais"
+    golems: "&f&lGolems"
+    bosses: "&4&lBosses"
   titulo: "&8&lLimites do servidor"
   limite:
     mobs: "&b&lMobs por chunk"
