@@ -51,8 +51,8 @@ comandos:
 
 limites:
   entidades: "&cLimite de entidades deste chunk atingido."
-  hoppers: "&cLimite de &f{limite} &chopper(s) por chunk atingido."
-  spawners: "&cLimite de &f{limite} &cspawner(s) por chunk atingido."
+  hoppers: "&cVocê atingiu o limite de &f{limite} &cfunis por chunk."
+  spawners: "&cVocê atingiu o limite de &f{limite} &cspawners por chunk."
   pistoes: "&cLimite de &f{limite} &cpistão(ões) por chunk atingido."
   observers: "&cLimite de &f{limite} &cobserver(s) por chunk atingido."
 
