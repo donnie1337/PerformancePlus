@@ -16,6 +16,7 @@ import com.performanceplus.limiters.SpawnerLimiter;
 import com.performanceplus.limiters.XPLimiter;
 import com.performanceplus.metrics.ChunkMetricsManager;
 import com.performanceplus.monitor.PerformanceMonitor;
+import com.performanceplus.util.MessageManager;
 import org.bukkit.Chunk;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.plugin.PluginManager;
@@ -25,6 +26,7 @@ public class PerformancePlus extends JavaPlugin {
 
     private static PerformancePlus instance;
     private ConfigManager configManager;
+    private MessageManager messageManager;
     private PerformanceMonitor performanceMonitor;
     private ChunkMetricsManager metricsManager;
     private FarmController farmController;
@@ -34,6 +36,7 @@ public class PerformancePlus extends JavaPlugin {
         instance = this;
         saveDefaultConfig();
         configManager = new ConfigManager(this);
+        messageManager = new MessageManager(this);
         metricsManager = new ChunkMetricsManager(this);
         farmController = new FarmController(this);
         performanceMonitor = new PerformanceMonitor(this);
@@ -42,14 +45,14 @@ public class PerformancePlus extends JavaPlugin {
         registerCommands();
         performanceMonitor.start();
 
-        getLogger().info("PerformancePlus habilitado: proteção adaptativa e limites controlados pelo config.yml.");
+        getLogger().info(messageManager.get("plugin.habilitado"));
     }
 
     @Override
     public void onDisable() {
         if (performanceMonitor != null) performanceMonitor.stop();
+        if (messageManager != null) getLogger().info(messageManager.get("plugin.desabilitado"));
         instance = null;
-        getLogger().info("PerformancePlus desabilitado.");
     }
 
     private void registerListeners() {
@@ -86,6 +89,7 @@ public class PerformancePlus extends JavaPlugin {
 
     public static PerformancePlus getInstance() { return instance; }
     public ConfigManager getConfigManager() { return configManager; }
+    public MessageManager getMessageManager() { return messageManager; }
     public PerformanceMonitor getPerformanceMonitor() { return performanceMonitor; }
     public ChunkMetricsManager getMetricsManager() { return metricsManager; }
     public FarmController getFarmController() { return farmController; }
