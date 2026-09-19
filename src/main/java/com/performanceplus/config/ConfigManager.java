@@ -24,7 +24,11 @@ public class ConfigManager {
         String worldPath = "mundos." + world.getName() + ".limites." + key;
         String worldValuePath = worldPath + ".valor";
         FileConfiguration cfg = raw();
-        return cfg.contains(worldPath) ? cfg.getInt(worldPath, def) : cfg.getInt(path, def);
+        int value = cfg.contains(worldValuePath) ? cfg.getInt(worldValuePath, def)
+                : (cfg.contains(worldPath) ? cfg.getInt(worldPath, def) : cfg.getInt(path, def));
+        if (value <= 0 || !cfg.getBoolean("performance.protecao-adaptativa.habilitado", true)
+                || plugin.getPerformanceMonitor() == null) return value;
+        return Math.max(1, (int) Math.floor(value * plugin.getPerformanceMonitor().getLimitMultiplier()));
     }
 
     public double getDouble(World world, String key, double def) {
