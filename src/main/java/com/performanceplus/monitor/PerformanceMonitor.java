@@ -1,9 +1,10 @@
 package com.performanceplus.monitor;
 
 import com.performanceplus.PerformancePlus;
-import com.performanceplus.util.MessageUtil;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.util.Map;
 
 public class PerformanceMonitor {
     private final PerformancePlus plugin;
@@ -50,7 +51,6 @@ public class PerformanceMonitor {
     public double getTps() { return currentTps; }
     public double getMspt() { return currentMspt; }
     public int getProtectionLevel() { return protectionLevel; }
-
     public boolean isProtectionActive() { return protectionLevel > 0; }
 
     private void updateProtectionLevel() {
@@ -88,18 +88,16 @@ public class PerformanceMonitor {
         if (now - lastWarningAt < cooldown) return;
         lastWarningAt = now;
 
-        plugin.getLogger().warning("Performance: TPS=" + String.format("%.2f", currentTps)
-                + " MSPT=" + String.format("%.2f", currentMspt)
-                + " nivel-protecao=" + protectionLevel);
+        Map<String, String> p = Map.of(
+                "{nivel}", String.valueOf(protectionLevel),
+                "{tps}", String.format("%.2f", currentTps),
+                "{mspt}", String.format("%.2f", currentMspt));
+        plugin.getLogger().info(plugin.getMessageManager().get("performance.console", p));
 
         if (!plugin.getConfigManager().getBoolean("monitoramento.notificar-staff", true)) return;
-        String msg = plugin.getConfigManager().getPrefix()
-                + "&eProteção de performance nível &f" + protectionLevel
-                + " &e| TPS: &f" + String.format("%.2f", currentTps)
-                + " &e| MSPT: &f" + String.format("%.2f", currentMspt);
         for (Player player : plugin.getServer().getOnlinePlayers()) {
             if (player.hasPermission("performanceplus.notify")) {
-                player.sendMessage(MessageUtil.color(msg));
+                plugin.getMessageManager().send(player, "performance.staff", p);
             }
         }
     }
