@@ -76,7 +76,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             ItemStack item = new ItemStack(entry.material);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setDisplayName("§b§l" + messages.get("gui.limite." + entry.messageKey));
+                meta.setDisplayName(messages.get("gui.limite." + entry.messageKey));
                 meta.setLore(lore);
                 item.setItemMeta(meta);
             }
@@ -101,7 +101,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private String formatValue(int value) {
-        return value <= 0 ? "Desativado" : String.valueOf(value);
+        return value <= 0 ? plugin.getMessageManager().get("gui.desativado") : String.valueOf(value);
     }
 
     @EventHandler
