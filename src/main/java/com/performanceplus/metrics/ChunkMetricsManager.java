@@ -38,6 +38,8 @@ public final class ChunkMetricsManager implements Listener {
         return metrics.computeIfAbsent(ChunkUtils.key(chunk), k -> new Metrics());
     }
 
+    public int size() { return metrics.size(); }
+
     public Metrics getIfPresent(Chunk chunk) {
         return metrics.get(ChunkUtils.key(chunk));
     }
