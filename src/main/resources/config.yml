@@ -376,8 +376,87 @@ gui:
           - "&7Limite: &f{limite}"
           - "&7Por chunk"
 
+      spawners:
+        slot: 0
+        material: "SPAWNER"
+        titulo: "&dSpawners"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      entidades:
+        slot: 0
+        material: "ARMOR_STAND"
+        titulo: "&eEntidades"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      itens:
+        slot: 1
+        material: "DIAMOND"
+        titulo: "&eItens"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+      xp-orbes:
+        slot: 2
+        material: "EXPERIENCE_BOTTLE"
+        titulo: "&eOrbes de XP"
+        lore:
+          - "&7Limite: &f{limite}"
+          - "&7Por chunk"
+
+  criatura-itens:
+    tamanho: 27
+    itens-por-pagina: 21
+    padrao:
+      titulo: "&f{criatura}"
+      lore:
+        - "&7Limite: &fNão configurado"
+        - "&7Raio: &fNão configurado"
+        - ""
+        - "&8Configuração individual por criatura."
+
   navegacao:
     voltar:
+      slot: 49
+      material: "ARROW"
+      titulo: "&fVoltar"
+      lore: []
+    redstone:
+      voltar:
+        slot: 49
+        material: "ARROW"
+        titulo: "&fVoltar"
+        lore: []
+    geradores:
+      voltar:
+        slot: 22
+        material: "ARROW"
+        titulo: "&fVoltar"
+        lore: []
+    decoracoes:
+      voltar:
+        slot: 22
+        material: "ARROW"
+        titulo: "&fVoltar"
+        lore: []
+    criaturas:
+      voltar:
+        slot: 22
+        material: "ARROW"
+        titulo: "&fVoltar"
+        lore: []
+      pagina-anterior:
+        slot: 21
+        material: "ARROW"
+        titulo: "&fPágina anterior"
+        lore: []
+      proxima-pagina:
+        slot: 23
+        material: "ARROW"
+        titulo: "&fPróxima página"
+        lore: []
+    
       slot: 49
       material: "ARROW"
       titulo: "&fVoltar"
