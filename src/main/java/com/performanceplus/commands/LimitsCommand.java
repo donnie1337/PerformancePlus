@@ -90,8 +90,12 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private void openCategory(Player player, Category category) {
         switch (category.key) {
-            case "redstone" -> openLimitPage(player, REDSTONE_TITLE, category.key,
-                    List.of("redstone", "hoppers", "pistoes", "pistoes-ativacoes-por-segundo", "observers"));
+            case "redstone" -> openLimitPage(player, REDSTONE_TITLE, category.key, List.of(
+                    "suporte-armaduras", "carrinho-com-bau", "comparadores", "ejetores", "liberadores",
+                    "carrinho-com-fornalha", "carrinho-com-funil", "hoppers", "carrinho-de-mina",
+                    "observers", "pistoes", "blocos-de-redstone", "lampadas-de-redstone",
+                    "tochas-de-redstone", "po-de-redstone", "repetidores", "sensores-de-sculk",
+                    "pistoes-com-slime", "carrinho-com-dinamite"));
             case "criaturas" -> openCreatureCategories(player);
             case "geradores" -> openLimitPage(player, GENERATORS_TITLE, category.key,
                     List.of("spawners"));
@@ -157,12 +161,11 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private void openLimitPage(Player player, String title, String category, List<String> keys) {
-        Inventory inventory = Bukkit.createInventory(null, 27, color(title));
+        Inventory inventory = Bukkit.createInventory(null, 54, color(title));
 
-        int slot = 10;
+        int slot = 0;
         for (String key : keys) {
-            Material material = materialForLimit(key);
-            ItemStack item = new ItemStack(material);
+            ItemStack item = new ItemStack(materialForLimit(key));
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
                 meta.setDisplayName(color(limitName(key)));
@@ -172,11 +175,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
                 ));
                 item.setItemMeta(meta);
             }
-            inventory.setItem(slot, item);
-            slot += 2;
+            inventory.setItem(slot++, item);
         }
 
-        setBackButton(inventory);
+        setBackButton(inventory, 49);
         player.openInventory(inventory);
     }
 
@@ -195,7 +197,11 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private void setBackButton(Inventory inventory) {
-        setButton(inventory, 22, Material.ARROW, "&fVoltar");
+        setBackButton(inventory, 22);
+    }
+
+    private void setBackButton(Inventory inventory, int slot) {
+        setButton(inventory, slot, Material.ARROW, "&fVoltar");
     }
 
     private void setButton(Inventory inventory, int slot, Material material, String name) {
@@ -221,10 +227,25 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private Material materialForLimit(String key) {
         return switch (key) {
+            case "suporte-armaduras" -> Material.ARMOR_STAND;
+            case "carrinho-com-bau" -> Material.CHEST_MINECART;
+            case "comparadores" -> Material.COMPARATOR;
+            case "ejetores" -> Material.DISPENSER;
+            case "liberadores" -> Material.DROPPER;
+            case "carrinho-com-fornalha" -> Material.FURNACE_MINECART;
+            case "carrinho-com-funil" -> Material.HOPPER_MINECART;
             case "hoppers" -> Material.HOPPER;
-            case "pistoes" -> Material.PISTON;
-            case "pistoes-ativacoes-por-segundo" -> Material.REDSTONE_TORCH;
+            case "carrinho-de-mina" -> Material.MINECART;
             case "observers" -> Material.OBSERVER;
+            case "pistoes" -> Material.PISTON;
+            case "blocos-de-redstone" -> Material.REDSTONE_BLOCK;
+            case "lampadas-de-redstone" -> Material.REDSTONE_LAMP;
+            case "tochas-de-redstone" -> Material.REDSTONE_TORCH;
+            case "po-de-redstone" -> Material.REDSTONE;
+            case "repetidores" -> Material.REPEATER;
+            case "sensores-de-sculk" -> Material.SCULK_SENSOR;
+            case "pistoes-com-slime" -> Material.STICKY_PISTON;
+            case "carrinho-com-dinamite" -> Material.TNT_MINECART;
             case "spawners" -> Material.SPAWNER;
             case "entidades" -> Material.ARMOR_STAND;
             case "itens" -> Material.DIAMOND;
@@ -235,10 +256,25 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private String limitName(String key) {
         return switch (key) {
-            case "hoppers" -> "&bFunis";
-            case "pistoes" -> "&bPistões";
-            case "pistoes-ativacoes-por-segundo" -> "&bAtivações de pistão por segundo";
-            case "observers" -> "&bObservadores";
+            case "suporte-armaduras" -> "&bSuporte de armaduras";
+            case "carrinho-com-bau" -> "&bCarrinho com baú";
+            case "comparadores" -> "&bComparador";
+            case "ejetores" -> "&bEjetor";
+            case "liberadores" -> "&bLiberador";
+            case "carrinho-com-fornalha" -> "&bCarrinho com fornalha";
+            case "carrinho-com-funil" -> "&bCarrinho com funil";
+            case "hoppers" -> "&bFunil";
+            case "carrinho-de-mina" -> "&bCarrinho de mina";
+            case "observers" -> "&bObservador";
+            case "pistoes" -> "&bPistão";
+            case "blocos-de-redstone" -> "&bBloco de redstone";
+            case "lampadas-de-redstone" -> "&bLâmpada de redstone";
+            case "tochas-de-redstone" -> "&bTocha de redstone";
+            case "po-de-redstone" -> "&bPó de redstone";
+            case "repetidores" -> "&bRepetidor";
+            case "sensores-de-sculk" -> "&bSensor de sculk";
+            case "pistoes-com-slime" -> "&bPistão com slime";
+            case "carrinho-com-dinamite" -> "&bCarrinho com dinamite";
             case "spawners" -> "&dSpawners";
             case "entidades" -> "&eEntidades";
             case "itens" -> "&eItens";
