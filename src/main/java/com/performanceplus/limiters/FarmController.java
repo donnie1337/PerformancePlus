@@ -3,9 +3,7 @@ package com.performanceplus.limiters;
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.metrics.ChunkMetricsManager.Metrics;
 import com.performanceplus.util.ChunkUtils;
-import com.performanceplus.util.MessageUtil;
 import org.bukkit.Chunk;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
@@ -15,6 +13,7 @@ import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -72,16 +71,17 @@ public class FarmController implements Listener {
 
     private void notifyStaff(Chunk chunk, int score) {
         if (!plugin.getConfigManager().getBoolean("farm.notificar-staff", true)) return;
-        String msg = plugin.getConfigManager().getPrefix()
-                + "&eChunk com alta concentração de recursos: &f"
-                + chunk.getWorld().getName() + " " + chunk.getX() + "," + chunk.getZ()
-                + " &7(pontuação " + score + ").";
-        for (Player player : plugin.getServer().getOnlinePlayers()) {
+        Map<String, String> p = Map.of(
+                "{mundo}", chunk.getWorld().getName(),
+                "{x}", String.valueOf(chunk.getX()),
+                "{z}", String.valueOf(chunk.getZ()),
+                "{score}", String.valueOf(score));
+        for (var player : plugin.getServer().getOnlinePlayers()) {
             if (player.hasPermission("performanceplus.notify.farms")) {
-                player.sendMessage(MessageUtil.color(msg));
+                plugin.getMessageManager().send(player, "farm.staff", p);
             }
         }
-        plugin.getLogger().warning("Chunk de alta concentração: " + ChunkUtils.key(chunk) + " score=" + score);
+        plugin.getLogger().info(plugin.getMessageManager().get("farm.console", p));
     }
 
     public Set<String> getFlaggedChunks() { return flaggedChunks; }
