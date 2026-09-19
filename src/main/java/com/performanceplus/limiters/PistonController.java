@@ -2,7 +2,7 @@ package com.performanceplus.limiters;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.metrics.ChunkMetricsManager.Metrics;
-import com.performanceplus.util.MessageUtil;
+import com.performanceplus.util.MessageManager;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -40,14 +40,13 @@ public class PistonController implements Listener {
         Metrics m = plugin.getMetricsManager().get(chunk);
         if (m.pistons() >= limit) {
             event.setCancelled(true);
-            MessageUtil.send(player, plugin.getConfigManager().getPrefix(),
-                    "&cLimite de &f" + limit + " &cpistão(ões) por chunk atingido.");
+            plugin.getMessageManager().send(player, "limites.pistoes",
+                    Map.of("{limite}", String.valueOf(limit)));
         }
     }
 
     @EventHandler(ignoreCancelled = true)
     public void onBreak(BlockBreakEvent event) {
-        // O contador central é atualizado pelo ChunkMetricsManager.
     }
 
     @EventHandler(ignoreCancelled = true)
@@ -62,7 +61,7 @@ public class PistonController implements Listener {
 
     private void checkActivity(Chunk chunk, org.bukkit.event.Cancellable event) {
         if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())
-                || !plugin.getConfigManager().isLimitEnabled("pistoes")) return;
+                || !plugin.getConfigManager().isLimitEnabled("pistoes-ativacoes-por-segundo")) return;
 
         int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "pistoes-ativacoes-por-segundo", 8);
         if (limit <= 0) return;
