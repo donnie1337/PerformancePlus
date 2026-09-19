@@ -163,7 +163,7 @@ public final class ChunkMetricsManager implements Listener {
         Metrics m = get(chunk);
         switch (material) {
             case HOPPER -> m.hoppers = Math.max(0, m.hoppers + delta);
-            case SPAWNER -> m.spawners = Math.max(0, m.spawners + delta);
+            case SPAWNER -> { }
             case PISTON, STICKY_PISTON -> m.pistons = Math.max(0, m.pistons + delta);
             case OBSERVER -> m.observers = Math.max(0, m.observers + delta);
             default -> { }
