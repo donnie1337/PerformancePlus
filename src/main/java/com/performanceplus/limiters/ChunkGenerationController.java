@@ -24,7 +24,8 @@ public class ChunkGenerationController implements Listener {
     public void onChunkLoad(ChunkLoadEvent event) {
         if (!event.isNewChunk() || plugin.getConfigManager().isWorldIgnored(event.getWorld())) return;
 
-        int limit = plugin.getConfigManager().getInt("limites.chunks-gerados-por-segundo", 20);
+        if (!plugin.getConfigManager().isLimitEnabled("chunks-gerados-por-segundo")) return;
+        int limit = plugin.getConfigManager().getLimit(event.getWorld(), "chunks-gerados-por-segundo", 20);
         if (limit <= 0) return;
 
         String key = event.getWorld().getUID().toString();
