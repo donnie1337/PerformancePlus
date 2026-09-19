@@ -103,8 +103,9 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private void openCreatureCategories(Player player) {
         Inventory inventory = Bukkit.createInventory(null, 27, color(CREATURES_TITLE));
 
+        int[] categorySlots = {9, 11, 13, 15, 17, 18, 20, 22, 24, 26};
         for (int i = 0; i < CREATURE_CATEGORIES.length; i++) {
-            int slot = 10 + (i * 2);
+            int slot = categorySlots[i];
             if (slot >= 27) {
                 break;
             }
