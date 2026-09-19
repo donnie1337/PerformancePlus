@@ -190,6 +190,11 @@ public final class ChunkMetricsManager implements Listener {
         }
     }
 
+    private boolean isPlacedSpawner(BlockState state) {
+        return state instanceof TileState tile
+                && tile.getPersistentDataContainer().has(placedSpawnerKey, PersistentDataType.BYTE);
+    }
+
     private void addEntity(Metrics m, Entity entity, String chunkKey) {
         if (entity.getType() == EntityType.PLAYER) return;
         if (entityLocations.putIfAbsent(entity.getUniqueId(), chunkKey) != null) return;
