@@ -66,6 +66,11 @@ public class ConfigManager {
         return raw().getBoolean("limites." + key + ".habilitado", true);
     }
 
+    public boolean isLimitEnabled(World world, String key) {
+        String worldPath = "mundos." + world.getName() + ".limites." + key + ".habilitado";
+        return raw().contains(worldPath) ? raw().getBoolean(worldPath) : isLimitEnabled(key);
+    }
+
     public List<String> getIgnoredWorlds() {
         return raw().getStringList("mundos.ignorados");
     }
