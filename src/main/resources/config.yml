@@ -1,66 +1,118 @@
-# =========================================================
-#  PerformancePlus - Configuração
-# =========================================================
-#
-#  Todas as chaves em "limits" valem para todos os mundos por padrão.
-#  Para sobrescrever um valor em um mundo específico, use a seção
-#  "worlds" no final deste arquivo.
+# ============================================================
+# PerformancePlus - proteção global de performance
+# ============================================================
+# O código executa as regras abaixo; os valores e ações ficam aqui.
+# Limites <= 0 desativam o respectivo limite.
 
-settings:
-  # Intervalo mínimo entre varreduras completas dos chunks carregados.
-  # 20 ticks = 1 segundo.
-  check-interval-ticks: 100
+configuracao:
+  prefixo: "&8[&b&lPerformance&f&lPlus&8] &7"
+  debug: false
 
-  # Quantos chunks podem ser analisados por tick durante a varredura.
-  # O processamento distribuído evita uma grande travada quando há muitos
-  # chunks carregados. Aumente somente se o servidor tiver folga de CPU.
-  scan-chunks-per-tick: 25
+mundos:
+  ignorados: []
 
-  ignored-worlds: []
+limites:
+  mobs:
+    habilitado: true
+    valor: 60
 
-  language-prefix: "&8[&b&lPerformance&f&lPlus&8] &7"
+  entidades:
+    habilitado: true
+    valor: 100
 
-  auto-cleanup:
-    enabled: false
+  itens:
+    habilitado: true
+    valor: 40
 
-limits:
-  mobs-per-chunk: 60
-  spawners-per-chunk: 4
-  entities-per-chunk: 100
-  items-per-chunk: 40
-  xp-orbs-per-chunk: 30
-  hoppers-per-chunk: 8
+  xp-orbes:
+    habilitado: true
+    valor: 30
 
-  # Atualizações de redstone permitidas por chunk dentro de cada janela
-  # aproximada de um tick (50 ms).
-  redstone-updates-per-chunk-per-tick: 25
+  hoppers:
+    habilitado: true
+    valor: 8
 
-  pistons-per-chunk: 12
-  piston-activations-per-second: 8
-  observers-per-chunk: 12
+  spawners:
+    habilitado: true
+    valor: 4
 
-  # Apenas alerta/monitoramento: o Bukkit não permite cancelar a geração
-  # depois que o ChunkLoadEvent de um chunk novo acontece.
-  max-chunks-generated-per-second: 10
+  pistoes:
+    habilitado: true
+    valor: 12
 
-farm-control:
-  enabled: true
-  activity-threshold: 50
-  notify-staff: true
+  pistoes-ativacoes-por-segundo:
+    habilitado: true
+    valor: 8
 
-monitoring:
-  enabled: true
-  tps-warning-threshold: 18.0
-  mspt-warning-threshold: 50.0
-  broadcast-to-ops: true
+  observers:
+    habilitado: true
+    valor: 12
 
-worlds:
-  world_nether:
-    limits:
-      mobs-per-chunk: 40
-      pistons-per-chunk: 8
-  # Exemplo:
-  # farm_world:
-  #   limits:
-  #     hoppers-per-chunk: 20
-  #     redstone-updates-per-chunk-per-tick: 60
+  redstone:
+    habilitado: true
+    valor: 25
+    # bloquear-atualizacao = corta a atualização que exceder o limite.
+    # monitorar = apenas registra a carga, sem alterar o redstone.
+    acao-quando-exceder: "bloquear-atualizacao"
+
+  chunks-gerados-por-segundo:
+    habilitado: true
+    valor: 20
+
+  # Pontuação de concentração usada apenas para identificar áreas muito pesadas.
+  farm-pontuacao:
+    habilitado: true
+    valor: 100
+
+farm:
+  habilitado: true
+  notificar-staff: true
+
+# ============================================================
+# Proteção adaptativa
+# ============================================================
+# Conforme o MSPT sobe, os limites configurados são reduzidos
+# automaticamente para proteger o servidor.
+performance:
+  habilitado: true
+
+  protecao-adaptativa:
+    habilitado: true
+
+    niveis:
+      atencao:
+        mspt: 50.0
+        multiplicador-limites: 0.90
+
+      alto:
+        mspt: 75.0
+        multiplicador-limites: 0.75
+
+      critico:
+        mspt: 100.0
+        multiplicador-limites: 0.50
+
+# ============================================================
+# Monitoramento
+# ============================================================
+monitoramento:
+  habilitado: true
+  alerta-mspt: 50.0
+  intervalo-alertas-segundos: 30
+  notificar-staff: true
+
+# ============================================================
+# Por mundo
+# ============================================================
+# O mundo abaixo sobrescreve somente o que estiver definido aqui.
+# mundos:
+#   mining:
+#     limites:
+#       mobs: 80
+#       hoppers: 12
+#       redstone: 40
+#     performance:
+#       protecao-adaptativa:
+#         niveis:
+#           critico:
+#             multiplicador-limites: 0.40
