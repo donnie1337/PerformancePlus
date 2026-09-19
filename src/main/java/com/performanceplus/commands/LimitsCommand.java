@@ -2,8 +2,8 @@ package com.performanceplus.commands;
 
 import com.performanceplus.PerformancePlus;
 import com.performanceplus.config.ConfigManager;
+import com.performanceplus.util.MessageManager;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.command.Command;
@@ -20,25 +20,24 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
 
 public class LimitsCommand implements CommandExecutor, Listener {
 
-    private static final String TITLE = "§8§lLimites do servidor";
     private final PerformancePlus plugin;
 
     private static final LimitEntry[] LIMITS = {
-            new LimitEntry("mobs", "Mobs por chunk", Material.ZOMBIE_HEAD),
-            new LimitEntry("spawners", "Spawners por chunk", Material.SPAWNER),
-            new LimitEntry("entidades", "Entidades por chunk", Material.ARMOR_STAND),
-            new LimitEntry("itens", "Itens por chunk", Material.DIAMOND),
-            new LimitEntry("xp-orbes", "Orbes de XP por chunk", Material.EXPERIENCE_BOTTLE),
-            new LimitEntry("hoppers", "Hoppers por chunk", Material.HOPPER),
-            new LimitEntry("redstone", "Redstone por chunk/tick", Material.REDSTONE),
-            new LimitEntry("pistoes", "Pistões por chunk", Material.PISTON),
-            new LimitEntry("pistoes-ativacoes-por-segundo", "Ativações de pistão/segundo", Material.PISTON),
-            new LimitEntry("observers", "Observers por chunk", Material.OBSERVER),
-            new LimitEntry("chunks-gerados-por-segundo", "Chunks gerados/segundo", Material.MAP)
+            new LimitEntry("mobs", "mobs", Material.ZOMBIE_HEAD),
+            new LimitEntry("spawners", "spawners", Material.SPAWNER),
+            new LimitEntry("entidades", "entidades", Material.ARMOR_STAND),
+            new LimitEntry("itens", "itens", Material.DIAMOND),
+            new LimitEntry("xp-orbes", "xp-orbes", Material.EXPERIENCE_BOTTLE),
+            new LimitEntry("hoppers", "hoppers", Material.HOPPER),
+            new LimitEntry("redstone", "redstone", Material.REDSTONE),
+            new LimitEntry("pistoes", "pistoes", Material.PISTON),
+            new LimitEntry("pistoes-ativacoes-por-segundo", "pistoes-ativacoes-por-segundo", Material.PISTON),
+            new LimitEntry("observers", "observers", Material.OBSERVER),
+            new LimitEntry("chunks-gerados-por-segundo", "chunks-gerados-por-segundo", Material.MAP)
     };
 
     public LimitsCommand(PerformancePlus plugin) {
@@ -48,17 +47,17 @@ public class LimitsCommand implements CommandExecutor, Listener {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ConfigManager.color(plugin.getConfigManager().getPrefix()
-                    + "&cEste comando só pode ser usado por jogadores."));
+            plugin.getMessageManager().send(sender, "comandos.apenas-jogador");
             return true;
         }
-
         open(player);
         return true;
     }
 
     public void open(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 27, TITLE);
+        MessageManager messages = plugin.getMessageManager();
+        String title = messages.get("gui.titulo");
+        Inventory inventory = Bukkit.createInventory(null, 27, title);
         World world = player.getWorld();
 
         for (int i = 0; i < LIMITS.length; i++) {
@@ -68,44 +67,37 @@ public class LimitsCommand implements CommandExecutor, Listener {
                     .contains("mundos." + world.getName() + ".limites." + entry.key);
 
             List<String> lore = new ArrayList<>();
-            lore.add("§7Valor atual: §f" + formatValue(value));
-            lore.add("§7Mundo: §f" + world.getName());
-            lore.add(override ? "§eValor específico deste mundo"
-                    : "§8Usando o limite global");
+            lore.add(messages.get("gui.lore.valor", Map.of("{valor}", formatValue(value))));
+            lore.add(messages.get("gui.lore.mundo", Map.of("{mundo}", world.getName())));
+            lore.add(messages.get(override ? "gui.lore.override" : "gui.lore.global"));
             lore.add("");
-            lore.add("§8• §7Controlado pelo §fconfig.yml");
+            lore.add(messages.get("gui.lore.controlado"));
 
             ItemStack item = new ItemStack(entry.material);
             ItemMeta meta = item.getItemMeta();
             if (meta != null) {
-                meta.setDisplayName("§b§l" + entry.displayName);
+                meta.setDisplayName("§b§l" + messages.get("gui.limite." + entry.messageKey));
                 meta.setLore(lore);
                 item.setItemMeta(meta);
             }
-            inventory.setItem(slotFor(i), item);
+            inventory.setItem(i, item);
         }
 
         ItemStack info = new ItemStack(Material.BOOK);
         ItemMeta infoMeta = info.getItemMeta();
         if (infoMeta != null) {
-            infoMeta.setDisplayName("§f§lInformações");
+            infoMeta.setDisplayName(messages.get("gui.info.nome"));
             infoMeta.setLore(List.of(
-                    "§7Estes são os limites ativos no seu mundo.",
-                    "§7Limites específicos do mundo têm prioridade",
-                    "§7sobre os valores globais do config.yml.",
+                    messages.get("gui.info.linha1"),
+                    messages.get("gui.info.linha2"),
+                    messages.get("gui.info.linha3"),
                     "",
-                    "§8• §7Comando: §f/limites"
+                    messages.get("gui.info.comando")
             ));
             info.setItemMeta(infoMeta);
         }
         inventory.setItem(22, info);
-
         player.openInventory(inventory);
-    }
-
-    private int slotFor(int index) {
-        int[] slots = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-        return slots[index];
     }
 
     private String formatValue(int value) {
@@ -114,17 +106,18 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     @EventHandler
     public void onInventoryDrag(InventoryDragEvent event) {
-        if (TITLE.equals(event.getView().getTitle())) event.setCancelled(true);
+        if (plugin.getMessageManager().get("gui.titulo").equals(event.getView().getTitle())) {
+            event.setCancelled(true);
+        }
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (!TITLE.equals(event.getView().getTitle())) {
-            return;
+        if (plugin.getMessageManager().get("gui.titulo").equals(event.getView().getTitle())) {
+            event.setCancelled(true);
         }
-        event.setCancelled(true);
     }
 
-    private record LimitEntry(String key, String displayName, Material material) {
+    private record LimitEntry(String key, String messageKey, Material material) {
     }
 }
