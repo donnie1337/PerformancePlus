@@ -456,21 +456,6 @@ gui:
         material: "ARROW"
         titulo: "&fPróxima página"
         lore: []
-    
-      slot: 49
-      material: "ARROW"
-      titulo: "&fVoltar"
-      lore: []
-    pagina-anterior:
-      slot: 21
-      material: "ARROW"
-      titulo: "&fPágina anterior"
-      lore: []
-    proxima-pagina:
-      slot: 23
-      material: "ARROW"
-      titulo: "&fPróxima página"
-      lore: []
 
 # ============================================================
 # Proteção adaptativa
