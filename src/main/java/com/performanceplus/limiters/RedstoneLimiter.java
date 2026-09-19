@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class RedstoneLimiter implements Listener {
     private final PerformancePlus plugin;
     private final Map<String, Integer> counts = new ConcurrentHashMap<>();
-    private long tick = 0L;
+    private long tick;
 
     public RedstoneLimiter(PerformancePlus plugin) {
         this.plugin = plugin;
@@ -30,14 +30,8 @@ public class RedstoneLimiter implements Listener {
         if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())
                 || !plugin.getConfigManager().isLimitEnabled("redstone")) return;
 
-        int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "redstone-por-chunk-por-tick", 25);
+        int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "redstone", 25);
         if (limit <= 0) return;
-
-        long currentTick = tick;
-        if (currentTick != tick) {
-            counts.clear();
-            tick = currentTick;
-        }
 
         String key = ChunkUtils.key(chunk);
         int count = counts.merge(key, 1, Integer::sum);
