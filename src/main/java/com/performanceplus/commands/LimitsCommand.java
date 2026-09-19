@@ -130,12 +130,26 @@ public class LimitsCommand implements CommandExecutor, Listener {
         String title = guiString(path, "titulo", "&8&lLimites");
         Inventory inventory = Bukkit.createInventory(null, size, color(title));
 
-        for (String key : keys) {
-            String itemPath = "itens." + key;
-            int slot = guiInt(itemPath, "slot", -1);
-            if (slot < 0 || slot >= size) continue;
-            inventory.setItem(slot, createConfiguredItem(itemPath, materialForLimit(key), key,
-                    List.of("&7Limite: &f{limite}", "&7Por chunk"), currentLimit(player, key)));
+        ConfigurationSection configuredItems = gui(path + ".itens");
+        if (configuredItems != null) {
+            for (String key : configuredItems.getKeys(false)) {
+                String itemPath = path + ".itens." + key;
+                int slot = guiInt(itemPath, "slot", -1);
+                if (slot < 0 || slot >= size) continue;
+
+                String limitKey = guiString(itemPath, "chave-limite", key);
+                int limit = currentLimit(player, limitKey);
+                inventory.setItem(slot, createConfiguredItem(itemPath, materialForLimit(key), key,
+                        List.of("&7Limite: &f{limite}", "&7Por chunk"), limit));
+            }
+        } else {
+            for (String key : keys) {
+                String itemPath = "itens." + key;
+                int slot = guiInt(itemPath, "slot", -1);
+                if (slot < 0 || slot >= size) continue;
+                inventory.setItem(slot, createConfiguredItem(itemPath, materialForLimit(key), key,
+                        List.of("&7Limite: &f{limite}", "&7Por chunk"), currentLimit(player, key)));
+            }
         }
 
         setNavigation(inventory, page, "voltar");
