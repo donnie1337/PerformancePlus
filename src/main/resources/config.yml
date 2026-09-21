@@ -137,7 +137,7 @@ gui:
           - "&7Clique para visualizar os limites."
       criaturas:
         slot: 12
-        material: "CREEPER_SPAWN_EGG"
+        material: "ZOMBIE_HEAD"
         titulo: "&a&lCriaturas"
         lore:
           - "&7Clique para visualizar os limites."
@@ -167,77 +167,75 @@ gui:
 
   criaturas:
     titulo: "&8&lLimites &8• &aCriaturas"
-    tamanho: 27
-    criaturas-slot: 11
-    animais-slot: 15
+    tamanho: 45
     categorias:
       animais-terrestres:
-        slot: 9
-        material: "COW_SPAWN_EGG"
+        slot: 10
+        material: "PANDA"
         titulo: "&a&lAnimais terrestres"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       animais-aquaticos:
         slot: 11
-        material: "COD_SPAWN_EGG"
+        material: "PLAYER_HEAD"
         titulo: "&b&lAnimais aquáticos"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
-      monstros-comuns:
-        slot: 13
-        material: "ZOMBIE_SPAWN_EGG"
-        titulo: "&c&lMonstros comuns"
+      monstros:
+        slot: 12
+        material: "ZOMBIE_HEAD"
+        titulo: "&c&lMonstros"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       nether:
-        slot: 15
-        material: "BLAZE_SPAWN_EGG"
+        slot: 19
+        material: "PLAYER_HEAD"
         titulo: "&4&lNether"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       end:
-        slot: 17
-        material: "ENDERMAN_SPAWN_EGG"
+        slot: 20
+        material: "PLAYER_HEAD"
         titulo: "&5&lEnd"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       pillagers:
-        slot: 18
-        material: "PILLAGER_SPAWN_EGG"
-        titulo: "&6&lPillagers"
+        slot: 21
+        material: "PLAYER_HEAD"
+        titulo: "&6&lSaqueadores"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       aldeoes-traders:
-        slot: 20
-        material: "VILLAGER_SPAWN_EGG"
-        titulo: "&e&lAldeões e Traders"
+        slot: 22
+        material: "PLAYER_HEAD"
+        titulo: "&e&lAldeões e Comerciantes"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       cavalos-especiais:
-        slot: 22
-        material: "HORSE_SPAWN_EGG"
-        titulo: "&b&lCavalos especiais"
+        slot: 23
+        material: "PLAYER_HEAD"
+        titulo: "&d&lCavalos especiais"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       golems:
         slot: 24
-        material: "IRON_GOLEM_SPAWN_EGG"
+        material: "PLAYER_HEAD"
         titulo: "&f&lGolems"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       bosses:
-        slot: 26
-        material: "WITHER_SPAWN_EGG"
-        titulo: "&4&lBosses"
+        slot: 25
+        material: "PLAYER_HEAD"
+        titulo: "&4&lChefes"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
@@ -426,23 +424,23 @@ gui:
       lore: []
     criaturas-menu:
       voltar:
-        slot: 22
+        slot: 40
         material: "ARROW"
         titulo: "&fVoltar ao menu principal"
         lore: []
     criaturas-pagina:
       voltar:
-        slot: 40
+        slot: 36
         material: "ARROW"
         titulo: "&fVoltar para Criaturas"
         lore: []
       pagina-anterior:
-        slot: 38
+        slot: 40
         material: "ARROW"
         titulo: "&fPágina anterior"
         lore: []
       proxima-pagina:
-        slot: 42
+        slot: 44
         material: "ARROW"
         titulo: "&fPróxima página"
         lore: []
