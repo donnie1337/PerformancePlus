@@ -52,7 +52,7 @@ public class PerformancePlusCommand implements CommandExecutor, TabCompleter {
         m.send(sender, "comandos.status.chunks-sinalizados", Map.of("{valor}", String.valueOf(plugin.getFarmController().getFlaggedChunks().size())));
     }
 
-    private void sendChunkInfo(CommandSender sender) {
+    public void sendChunkInfo(CommandSender sender) {
         MessageManager m = plugin.getMessageManager();
         if (!(sender instanceof Player player)) {
             m.send(sender, "comandos.apenas-jogador");
