@@ -336,16 +336,14 @@ public class LimitsCommand implements CommandExecutor, Listener {
         meta.setLore(List.of(
                 color("&7"),
                 color("&f• &7Para depurar a chunk atual, use:"),
-                color("&e  /performanceplus chunk"),
+                color("&e  /limite chunk"),
                 color("&7"),
                 color("&f• &7Uma chunk mede &f16 x 16 blocos&7."),
                 color("&7  São &f256 blocos por camada."),
                 color("&7"),
                 color("&f• &7Criaturas usam limite por proximidade."),
                 color("&7  Funis, redstone e mecanismos usam chunk."),
-                color("&7"),
-                color("&f• &7Altere o limite e o raio no &fconfig.yml&7."),
-                color("&7  Em seguida, use &e/performanceplus reload&7.")
+
         ));
         book.setItemMeta(meta);
         inventory.setItem(slot, book);
