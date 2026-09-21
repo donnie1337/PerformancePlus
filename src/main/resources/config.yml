@@ -107,6 +107,12 @@ limites:
   sensores-de-sculk:
     habilitado: true
     valor: 12
+  catalisadores-de-sculk:
+    habilitado: true
+    valor: 12
+  emissores-de-sculk:
+    habilitado: true
+    valor: 12
   pistoes-com-slime:
     habilitado: true
     valor: 20
