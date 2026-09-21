@@ -29,8 +29,8 @@ comandos:
 
   chunk:
     titulo: "&8&m----------------------------------------"
-    cabecalho: "&b&lINFORMAÇÕES DA CHUNK &8• &f{x}&7, &f{z}"
-    mundo: "&8• &7Mundo: &f{mundo}"
+    cabecalho: "&b&lINFORMAÇÕES DA CHUNK"
+    coordenadas: "&8• &7Z: &f{z} &8| &7X: &f{x}"
     mobs: "&8• &7Criaturas nesta chunk: &f{valor}"
     entidades: "&8• &7Entidades totais: &f{valor}"
     itens: "&8• &7Itens no chão: &f{valor}"
