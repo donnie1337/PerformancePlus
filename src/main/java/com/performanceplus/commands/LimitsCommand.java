@@ -106,48 +106,68 @@ public class LimitsCommand implements CommandExecutor, Listener {
         switch (category.key) {
             case "redstone" -> openLimitPage(player, "redstone", REDSTONE_KEYS);
             case "criaturas" -> openCreatureCategories(player);
-            case "geradores" -> openLimitPage(player, "geradores", List.of("spawners"));
-            case "decoracoes" -> openLimitPage(player, "decoracoes", List.of("entidades", "itens", "xp-orbes"));
+            case "geradores" -> openLimitPage(player, "geradores", GENERATOR_KEYS);
+            case "decoracoes" -> openLimitPage(player, "decoracoes", DECORATION_KEYS);
         }
     }
 
     private static final List<String> REDSTONE_KEYS = List.of(
-            "suporte-armaduras", "carrinho-com-bau", "comparadores", "ejetores", "liberadores",
-            "carrinho-com-fornalha", "carrinho-com-funil", "hoppers", "carrinho-de-mina",
-            "observers", "pistoes", "blocos-de-redstone", "lampadas-de-redstone",
-            "tochas-de-redstone", "po-de-redstone", "repetidores", "sensores-de-sculk",
-            "pistoes-com-slime", "carrinho-com-dinamite"
+            "redstone", "suporte-armaduras", "carrinho-com-bau", "comparadores", "ejetores",
+            "liberadores", "carrinho-com-fornalha", "carrinho-com-funil", "hoppers",
+            "carrinho-de-mina", "observers", "pistoes", "pistoes-ativacoes-por-segundo",
+            "blocos-de-redstone", "lampadas-de-redstone", "tochas-de-redstone",
+            "po-de-redstone", "repetidores", "sensores-de-sculk", "pistoes-com-slime",
+            "carrinho-com-dinamite"
+    );
+
+    private static final List<String> GENERATOR_KEYS = List.of(
+            "spawners", "chunks-gerados-por-segundo"
+    );
+
+    private static final List<String> DECORATION_KEYS = List.of(
+            "entidades", "itens", "xp-orbes"
     );
 
     private void openLimitPage(Player player, String page, List<String> keys) {
-        String path = "paginas." + page;
-        int size = guiInt(path, "tamanho", page.equals("redstone") ? 54 : 27);
+        openLimitPage(player, page, keys, 0);
+    }
+
+    private void openLimitPage(Player player, String pageKey, List<String> keys, int page) {
+        int perPage = HEAD_SLOTS.length;
+        int maxPage = Math.max(0, (keys.size() - 1) / perPage);
+        page = Math.max(0, Math.min(page, maxPage));
+
+        String path = "paginas." + pageKey;
+        boolean hasNextPage = maxPage > 0;
+        int size = page == 0
+                ? guiInt(path, hasNextPage ? "tamanho-primeira-pagina" : "tamanho-pagina-unica",
+                        hasNextPage ? FIRST_CREATURE_PAGE_SIZE : SINGLE_CREATURE_PAGE_SIZE)
+                : guiInt(path, "tamanho-outras-paginas", OTHER_CREATURE_PAGE_SIZE);
         String title = guiString(path, "titulo", "&8&lLimites");
-        Inventory inventory = Bukkit.createInventory(null, size, color(title));
+        Inventory inventory = Bukkit.createInventory(null, size,
+                color(title + " &8• &7" + (page + 1) + "/" + (maxPage + 1)));
 
-        ConfigurationSection configuredItems = gui(path + ".itens");
-        if (configuredItems != null) {
-            for (String key : configuredItems.getKeys(false)) {
-                String itemPath = path + ".itens." + key;
-                int slot = guiInt(itemPath, "slot", -1);
-                if (slot < 0 || slot >= size) continue;
-
-                String limitKey = guiString(itemPath, "chave-limite", key);
-                int limit = currentLimit(player, limitKey);
-                inventory.setItem(slot, createConfiguredItem(itemPath, materialForLimit(key), key,
-                        List.of("&7Limite: &f{limite}", "&7Por chunk"), limit));
-            }
-        } else {
-            for (String key : keys) {
-                String itemPath = "itens." + key;
-                int slot = guiInt(itemPath, "slot", -1);
-                if (slot < 0 || slot >= size) continue;
-                inventory.setItem(slot, createConfiguredItem(itemPath, materialForLimit(key), key,
-                        List.of("&7Limite: &f{limite}", "&7Por chunk"), currentLimit(player, key)));
-            }
+        int startIndex = page * perPage;
+        int endIndex = Math.min(startIndex + perPage, keys.size());
+        for (int index = startIndex; index < endIndex; index++) {
+            String key = keys.get(index);
+            inventory.setItem(HEAD_SLOTS[index - startIndex],
+                    createLimitItem(key, currentLimit(player, key)));
         }
 
-        setNavigation(inventory, page, "voltar");
+        int leftArrowSlot;
+        if (page == 0) {
+            leftArrowSlot = hasNextPage ? CREATURE_BACK_SLOT : SINGLE_CREATURE_BACK_SLOT;
+            setNavigation(inventory, pageKey, "voltar", leftArrowSlot);
+            if (page < maxPage) {
+                setNavigation(inventory, pageKey, "proxima-pagina", CREATURE_NEXT_SLOT);
+            }
+        } else {
+            leftArrowSlot = CREATURE_PREVIOUS_SLOT;
+            setNavigation(inventory, pageKey, "pagina-anterior", leftArrowSlot);
+        }
+        setChunkInformationBook(inventory, leftArrowSlot - 2);
+
         player.openInventory(inventory);
     }
 
@@ -262,7 +282,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
                     "&f" + formatMobName(mob),
                     List.of(
                             "",
-                            "&7Limite por proximidade: &f" + currentLimit(player, mob),
+                            "&7Limite por proximidade: &f" + currentCreatureLimit(player, mob),
                             "&7(Raio de alcance: &f" + currentRadius(player, mob) + " blocos&7)"
                     )
             );
@@ -353,6 +373,73 @@ public class LimitsCommand implements CommandExecutor, Listener {
         inventory.setItem(slot, book);
     }
 
+    private ItemStack createLimitItem(String key, int limit) {
+        ItemStack item = new ItemStack(materialForLimit(key));
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null) return item;
+
+        meta.setDisplayName(color("&f" + formatLimitName(key)));
+        meta.setLore(limitLore(key, limit).stream().map(this::color).toList());
+        item.setItemMeta(meta);
+        return item;
+    }
+
+    private List<String> limitLore(String key, int limit) {
+        return List.of(
+                "",
+                "&7" + limitScopeLabel(key) + ": &f" + limit,
+                "&7(" + limitScopeDetail(key) + "&7)"
+        );
+    }
+
+    private String limitScopeLabel(String key) {
+        return switch (key) {
+            case "redstone" -> "Limite por chunk/tick";
+            case "pistoes-ativacoes-por-segundo", "chunks-gerados-por-segundo" -> "Limite por segundo";
+            default -> "Limite por chunk";
+        };
+    }
+
+    private String limitScopeDetail(String key) {
+        return switch (key) {
+            case "redstone" -> "Monitorado a cada &ftick";
+            case "pistoes-ativacoes-por-segundo", "chunks-gerados-por-segundo" -> "Monitorado por &fsegundo";
+            default -> "Área: &f16 x 16 blocos";
+        };
+    }
+
+    private String formatLimitName(String key) {
+        return switch (key) {
+            case "redstone" -> "Circuitos de redstone";
+            case "suporte-armaduras" -> "Suporte de armaduras";
+            case "carrinho-com-bau" -> "Carrinho com baú";
+            case "comparadores" -> "Comparadores";
+            case "ejetores" -> "Ejetores";
+            case "liberadores" -> "Liberadores";
+            case "carrinho-com-fornalha" -> "Carrinho com fornalha";
+            case "carrinho-com-funil" -> "Carrinho com funil";
+            case "hoppers" -> "Funis";
+            case "carrinho-de-mina" -> "Carrinho de mina";
+            case "observers" -> "Observers";
+            case "pistoes" -> "Pistões";
+            case "pistoes-ativacoes-por-segundo" -> "Ativações de pistão";
+            case "blocos-de-redstone" -> "Blocos de redstone";
+            case "lampadas-de-redstone" -> "Lâmpadas de redstone";
+            case "tochas-de-redstone" -> "Tochas de redstone";
+            case "po-de-redstone" -> "Pó de redstone";
+            case "repetidores" -> "Repetidores";
+            case "sensores-de-sculk" -> "Sensores de sculk";
+            case "pistoes-com-slime" -> "Pistões com slime";
+            case "carrinho-com-dinamite" -> "Carrinho com dinamite";
+            case "spawners" -> "Spawners";
+            case "chunks-gerados-por-segundo" -> "Chunks gerados";
+            case "entidades" -> "Entidades";
+            case "itens" -> "Itens no chão";
+            case "xp-orbes" -> "Orbes de XP";
+            default -> key;
+        };
+    }
+
     private ItemStack createConfiguredItem(String path, Material fallbackMaterial, String key, List<String> fallbackLore, int limit) {
         return createConfiguredItem(path, fallbackMaterial, key, fallbackLore, limit, null);
     }
@@ -394,6 +481,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private int currentLimit(Player player, String key) {
+        return plugin.getConfigManager().getLimit(player.getWorld(), key, 0);
+    }
+
+    private int currentCreatureLimit(Player player, String key) {
         return plugin.getConfigManager().getMobLimit(player.getWorld(), mobLimitKey(key), 8);
     }
 
@@ -430,6 +521,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
             case "pistoes-com-slime" -> Material.STICKY_PISTON;
             case "carrinho-com-dinamite" -> Material.TNT_MINECART;
             case "spawners" -> Material.SPAWNER;
+            case "chunks-gerados-por-segundo" -> Material.MAP;
+            case "pistoes-ativacoes-por-segundo" -> Material.PISTON;
             case "entidades" -> Material.ARMOR_STAND;
             case "itens" -> Material.DIAMOND;
             case "xp-orbes" -> Material.EXPERIENCE_BOTTLE;
@@ -549,12 +642,23 @@ public class LimitsCommand implements CommandExecutor, Listener {
             return;
         }
 
-        if (isLimitPageTitle(title, "redstone") || isLimitPageTitle(title, "geradores") || isLimitPageTitle(title, "decoracoes")) {
-            if (slot == guiInt("navegacao.redstone.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))
-                    || slot == guiInt("navegacao.geradores.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))
-                    || slot == guiInt("navegacao.decoracoes.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))) {
-                openMain(player);
-            }
+        String limitPage = findLimitPageByTitle(title);
+        if (limitPage == null) return;
+
+        List<String> keys = limitPageKeys(limitPage);
+        int page = extrairPagina(title);
+        int maxPage = Math.max(0, (keys.size() - 1) / HEAD_SLOTS.length);
+
+        if (page == 0 && slot == (maxPage > 0 ? CREATURE_BACK_SLOT : SINGLE_CREATURE_BACK_SLOT)) {
+            openMain(player);
+            return;
+        }
+        if (page > 0 && slot == CREATURE_PREVIOUS_SLOT) {
+            openLimitPage(player, limitPage, keys, page - 1);
+            return;
+        }
+        if (page < maxPage && slot == CREATURE_NEXT_SLOT) {
+            openLimitPage(player, limitPage, keys, page + 1);
         }
     }
 
@@ -572,18 +676,28 @@ public class LimitsCommand implements CommandExecutor, Listener {
         }
     }
 
-    private boolean isLimitPageTitle(String title, String page) {
-        if (title == null) return false;
-        String configuredTitle = guiString("paginas." + page, "titulo", "&8&lLimites");
-        return color(configuredTitle).equals(title);
+    private String findLimitPageByTitle(String title) {
+        if (title == null) return null;
+        for (String page : List.of("redstone", "geradores", "decoracoes")) {
+            String configuredTitle = color(guiString("paginas." + page, "titulo", "&8&lLimites"));
+            if (title.startsWith(configuredTitle)) return page;
+        }
+        return null;
+    }
+
+    private List<String> limitPageKeys(String page) {
+        return switch (page) {
+            case "redstone" -> REDSTONE_KEYS;
+            case "geradores" -> GENERATOR_KEYS;
+            case "decoracoes" -> DECORATION_KEYS;
+            default -> List.of();
+        };
     }
 
     private boolean isLimitsInventory(String title) {
         if (title == null) return false;
         return isMainTitle(title) || isCategoryTitle(title)
-                || isLimitPageTitle(title, "redstone")
-                || isLimitPageTitle(title, "geradores")
-                || isLimitPageTitle(title, "decoracoes")
+                || findLimitPageByTitle(title) != null
                 || isCreaturePageTitle(title);
     }
 

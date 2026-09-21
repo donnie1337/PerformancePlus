@@ -166,13 +166,19 @@ gui:
   paginas:
     redstone:
       titulo: "&8&lLimites &8• &cRedstone"
-      tamanho: 54
+      tamanho-primeira-pagina: 54
+      tamanho-pagina-unica: 45
+      tamanho-outras-paginas: 36
     geradores:
       titulo: "&8&lLimites &8• &5Geradores"
-      tamanho: 27
+      tamanho-primeira-pagina: 54
+      tamanho-pagina-unica: 45
+      tamanho-outras-paginas: 36
     decoracoes:
       titulo: "&8&lLimites &8• &eDecorações"
-      tamanho: 27
+      tamanho-primeira-pagina: 54
+      tamanho-pagina-unica: 45
+      tamanho-outras-paginas: 36
 
   criaturas:
     titulo: "&8&lLimites &8• &aCriaturas"
