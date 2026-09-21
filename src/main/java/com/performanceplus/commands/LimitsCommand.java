@@ -255,20 +255,27 @@ public class LimitsCommand implements CommandExecutor, Listener {
             ItemStack head = criarCabecaCombatePlus(
                     mob,
                     "&f" + formatMobName(mob),
-                    List.of("&7Limite por chunk: &f" + currentLimit(player, mob))
+                    List.of(
+                            "",
+                            "&7Limite por proximidade: &f" + currentLimit(player, mob),
+                            "&7(Raio de alcance: &f" + currentRadius(player, mob) + " blocos&7)"
+                    )
             );
             inventory.setItem(slot, head);
         }
 
+        int leftArrowSlot;
         if (page == 0) {
-            setNavigation(inventory, "criaturas-pagina", "voltar",
-                    hasNextPage ? CREATURE_BACK_SLOT : SINGLE_CREATURE_BACK_SLOT);
+            leftArrowSlot = hasNextPage ? CREATURE_BACK_SLOT : SINGLE_CREATURE_BACK_SLOT;
+            setNavigation(inventory, "criaturas-pagina", "voltar", leftArrowSlot);
             if (page < maxPage) {
                 setNavigation(inventory, "criaturas-pagina", "proxima-pagina", CREATURE_NEXT_SLOT);
             }
         } else {
-            setNavigation(inventory, "criaturas-pagina", "pagina-anterior", CREATURE_PREVIOUS_SLOT);
+            leftArrowSlot = CREATURE_PREVIOUS_SLOT;
+            setNavigation(inventory, "criaturas-pagina", "pagina-anterior", leftArrowSlot);
         }
+        setChunkInformationBook(inventory, leftArrowSlot - 2);
 
         player.openInventory(inventory);
     }
@@ -318,6 +325,32 @@ public class LimitsCommand implements CommandExecutor, Listener {
         return item;
     }
 
+    private void setChunkInformationBook(Inventory inventory, int slot) {
+        if (slot < 0 || slot >= inventory.getSize()) return;
+
+        ItemStack book = new ItemStack(Material.BOOK);
+        ItemMeta meta = book.getItemMeta();
+        if (meta == null) return;
+
+        meta.setDisplayName(color("&eInformações sobre Chunk"));
+        meta.setLore(List.of(
+                color("&7"),
+                color("&f• &7Para depurar a chunk atual, use:"),
+                color("&e  /performanceplus chunk"),
+                color("&7"),
+                color("&f• &7Uma chunk mede &f16 x 16 blocos&7."),
+                color("&7  São &f256 blocos por camada."),
+                color("&7"),
+                color("&f• &7Criaturas usam limite por proximidade."),
+                color("&7  Funis, redstone e mecanismos usam chunk."),
+                color("&7"),
+                color("&f• &7Altere o limite e o raio no &fconfig.yml&7."),
+                color("&7  Em seguida, use &e/performanceplus reload&7.")
+        ));
+        book.setItemMeta(meta);
+        inventory.setItem(slot, book);
+    }
+
     private ItemStack createConfiguredItem(String path, Material fallbackMaterial, String key, List<String> fallbackLore, int limit) {
         return createConfiguredItem(path, fallbackMaterial, key, fallbackLore, limit, null);
     }
@@ -359,8 +392,18 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private int currentLimit(Player player, String key) {
-        String limitKey = key.equals("charged_creeper") ? "creeper" : key;
-        return plugin.getConfigManager().getLimit(player.getWorld(), limitKey, 0);
+        return plugin.getConfigManager().getMobLimit(player.getWorld(), mobLimitKey(key), 8);
+    }
+
+    private String currentRadius(Player player, String key) {
+        double radius = plugin.getConfigManager().getMobRadius(player.getWorld(), mobLimitKey(key), 16);
+        return radius == Math.rint(radius)
+                ? String.valueOf((int) radius)
+                : String.format(java.util.Locale.ROOT, "%.1f", radius);
+    }
+
+    private String mobLimitKey(String key) {
+        return key.equals("charged_creeper") ? "creeper" : key;
     }
 
     private Material materialForLimit(String key) {
