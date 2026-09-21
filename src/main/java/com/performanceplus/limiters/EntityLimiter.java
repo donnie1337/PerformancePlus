@@ -27,7 +27,9 @@ public class EntityLimiter implements Listener {
 
     @EventHandler(ignoreCancelled = true)
     public void onEntitySpawn(EntitySpawnEvent event) {
-        if (event.getEntityType() == EntityType.PLAYER) return;
+        if (event.getEntityType() == EntityType.PLAYER
+                || event.getEntityType() == EntityType.ITEM
+                || event.getEntityType() == EntityType.EXPERIENCE_ORB) return;
         check(event.getLocation().getChunk(), event, null);
     }
 

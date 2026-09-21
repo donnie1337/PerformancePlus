@@ -29,14 +29,6 @@ limites:
     habilitado: true
     valor: 20
 
-  itens:
-    habilitado: true
-    valor: 40
-
-  xp-orbes:
-    habilitado: true
-    valor: 30
-
   hoppers:
     habilitado: true
     valor: 20
@@ -429,20 +421,6 @@ gui:
         lore:
           - "&7Limite: &f{limite}"
           - "&7Por chunk"
-      itens:
-        slot: 1
-        material: "DIAMOND"
-        titulo: "&eItens"
-        lore:
-          - "&7Limite: &f{limite}"
-          - "&7Por chunk"
-      xp-orbes:
-        slot: 2
-        material: "EXPERIENCE_BOTTLE"
-        titulo: "&eOrbes de XP"
-        lore:
-          - "&7Limite: &f{limite}"
-          - "&7Por chunk"
 
   criatura-itens:
     tamanho-primeira-pagina: 54
@@ -581,6 +559,10 @@ performance:
 # ============================================================
 # Monitoramento
 # ============================================================
+lixeiro:
+  habilitado: true
+  intervalo-minutos: 30
+
 monitoramento:
   habilitado: false
   alerta-mspt: 50.0

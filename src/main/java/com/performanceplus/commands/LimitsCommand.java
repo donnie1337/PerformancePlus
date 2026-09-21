@@ -125,7 +125,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     );
 
     private static final List<String> DECORATION_KEYS = List.of(
-            "entidades", "itens", "xp-orbes"
+            "entidades"
     );
 
     private void openLimitPage(Player player, String page, List<String> keys) {

@@ -35,6 +35,7 @@ public class PerformancePlusCommand implements CommandExecutor, TabCompleter {
                 }
                 plugin.getConfigManager().reload();
                 messages.reload();
+                plugin.getItemCleanupManager().reload();
                 messages.send(sender, "comandos.config-recarregada");
             }
             default -> sendHelp(sender);

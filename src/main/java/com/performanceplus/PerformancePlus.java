@@ -1,19 +1,20 @@
 package com.performanceplus;
 
+import com.performanceplus.commands.CleanupCommand;
 import com.performanceplus.commands.LimitsCommand;
 import com.performanceplus.commands.PerformancePlusCommand;
 import com.performanceplus.config.ConfigManager;
 import com.performanceplus.limiters.ChunkGenerationController;
+import com.performanceplus.limiters.ComponentLimiter;
 import com.performanceplus.limiters.EntityLimiter;
 import com.performanceplus.limiters.FarmController;
 import com.performanceplus.limiters.HopperLimiter;
-import com.performanceplus.limiters.ItemLimiter;
+import com.performanceplus.limiters.ItemCleanupManager;
 import com.performanceplus.limiters.MobLimiter;
 import com.performanceplus.limiters.ObserverController;
 import com.performanceplus.limiters.PistonController;
 import com.performanceplus.limiters.RedstoneLimiter;
 import com.performanceplus.limiters.SpawnerLimiter;
-import com.performanceplus.limiters.XPLimiter;
 import com.performanceplus.metrics.ChunkMetricsManager;
 import com.performanceplus.monitor.PerformanceMonitor;
 import com.performanceplus.util.MessageManager;
@@ -30,6 +31,7 @@ public class PerformancePlus extends JavaPlugin {
     private PerformanceMonitor performanceMonitor;
     private ChunkMetricsManager metricsManager;
     private FarmController farmController;
+    private ItemCleanupManager itemCleanupManager;
 
     @Override
     public void onEnable() {
@@ -39,10 +41,12 @@ public class PerformancePlus extends JavaPlugin {
         messageManager = new MessageManager(this);
         metricsManager = new ChunkMetricsManager(this);
         farmController = new FarmController(this);
+        itemCleanupManager = new ItemCleanupManager(this);
         performanceMonitor = new PerformanceMonitor(this);
 
         registerListeners();
         registerCommands();
+        itemCleanupManager.start();
         performanceMonitor.start();
 
         getLogger().info(messageManager.get("plugin.habilitado"));
@@ -51,6 +55,7 @@ public class PerformancePlus extends JavaPlugin {
     @Override
     public void onDisable() {
         if (performanceMonitor != null) performanceMonitor.stop();
+        if (itemCleanupManager != null) itemCleanupManager.stop();
         if (messageManager != null) getLogger().info(messageManager.get("plugin.desabilitado"));
         instance = null;
     }
@@ -61,9 +66,8 @@ public class PerformancePlus extends JavaPlugin {
         pm.registerEvents(new MobLimiter(this), this);
         pm.registerEvents(new SpawnerLimiter(this), this);
         pm.registerEvents(new EntityLimiter(this), this);
-        pm.registerEvents(new ItemLimiter(this), this);
-        pm.registerEvents(new XPLimiter(this), this);
         pm.registerEvents(new RedstoneLimiter(this), this);
+        pm.registerEvents(new ComponentLimiter(this), this);
         pm.registerEvents(new HopperLimiter(this), this);
         pm.registerEvents(new PistonController(this), this);
         pm.registerEvents(new ObserverController(this), this);
@@ -77,6 +81,11 @@ public class PerformancePlus extends JavaPlugin {
         if (command != null) {
             command.setExecutor(commandExecutor);
             command.setTabCompleter(commandExecutor);
+        }
+
+        PluginCommand cleanupCommand = getCommand("limpeza");
+        if (cleanupCommand != null) {
+            cleanupCommand.setExecutor(new CleanupCommand(this));
         }
 
         LimitsCommand limits = new LimitsCommand(this);
@@ -93,6 +102,7 @@ public class PerformancePlus extends JavaPlugin {
     public PerformanceMonitor getPerformanceMonitor() { return performanceMonitor; }
     public ChunkMetricsManager getMetricsManager() { return metricsManager; }
     public FarmController getFarmController() { return farmController; }
+    public ItemCleanupManager getItemCleanupManager() { return itemCleanupManager; }
 
     public int getPistonCount(Chunk chunk) {
         return metricsManager.get(chunk).pistons();

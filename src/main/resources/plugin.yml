@@ -17,6 +17,10 @@ commands:
     description: Mostra os limites ativos do servidor
     aliases: [limite]
     usage: /limites
+  limpeza:
+    description: Remove imediatamente os itens jogados no chão
+    usage: /limpeza
+    permission: performanceplus.admin
 
 permissions:
   performanceplus.admin:
@@ -39,4 +43,7 @@ permissions:
     default: op
   performanceplus.bypass.observers:
     description: Ignora o limite de observers
+    default: op
+  performanceplus.bypass.componentes:
+    description: Ignora os limites dos componentes de redstone e decorações
     default: op
