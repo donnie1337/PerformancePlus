@@ -155,8 +155,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
                     "parrot", "pig", "fox", "frog", "armadillo", "polar_bear", "cow"
             )),
             new CreatureCategory("animais-aquaticos", "&bAnimais aquáticos", "axolotl", List.of(
-                    "axolotl", "cod", "dolphin", "glow_squid", "pufferfish", "salmon", "squid",
-                    "tadpole", "tropical_fish", "turtle"
+                    "axolotl", "cod", "dolphin", "drowned", "elder_guardian", "glow_squid", "guardian",
+                    "pufferfish", "salmon", "squid", "tadpole", "tropical_fish", "turtle", "nautilus"
             )),
             new CreatureCategory("monstros", "&cMonstros", "zombie", List.of(
                     "bogged", "breeze", "cave_spider", "creaking", "creeper", "drowned", "elder_guardian",
@@ -396,10 +396,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
             case "armadillo" -> "Tatu"; case "bat" -> "Morcego"; case "ocelot" -> "Jaguatirica";
             case "turtle" -> "Tartaruga"; case "dolphin" -> "Golfinho"; case "squid" -> "Lula"; case "glow_squid" -> "Lula brilhante";
             case "cod" -> "Bacalhau"; case "salmon" -> "Salmão"; case "tropical_fish" -> "Peixe tropical"; case "pufferfish" -> "Baiacu";
-            case "axolotl" -> "Axolote"; case "frog" -> "Sapo"; case "tadpole" -> "Girino";
+            case "axolotl" -> "Axolote"; case "nautilus" -> "Náutilo"; case "frog" -> "Sapo"; case "tadpole" -> "Girino";
             case "zombie" -> "Zumbi"; case "skeleton" -> "Esqueleto"; case "creeper" -> "Creeper"; case "spider" -> "Aranha";
             case "cave_spider" -> "Aranha das cavernas"; case "witch" -> "Bruxa"; case "slime" -> "Slime"; case "phantom" -> "Fantasma";
-            case "silverfish" -> "Traça"; case "endermite" -> "Endermite"; case "guardian" -> "Guardião"; case "elder_guardian" -> "Guardião ancião";
+            case "silverfish" -> "Traça"; case "endermite" -> "Endermite"; case "guardian" -> "Guardião"; case "elder_guardian" -> "Guardião mestre";
             case "drowned" -> "Afogado"; case "husk" -> "Zumbi-múmia"; case "stray" -> "Esqueleto glacial"; case "bogged" -> "Esqueleto do pântano";
             case "warden" -> "Warden"; case "breeze" -> "Brisa"; case "creaking" -> "Creaking"; case "zombie_villager" -> "Aldeão zumbi";
             case "pillager" -> "Saqueador"; case "vindicator" -> "Vingador"; case "evoker" -> "Invocador"; case "illusioner" -> "Ilusionista";
