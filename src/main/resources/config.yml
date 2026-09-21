@@ -168,6 +168,8 @@ gui:
   criaturas:
     titulo: "&8&lLimites &8• &aCriaturas"
     tamanho: 27
+    criaturas-slot: 11
+    animais-slot: 15
     categorias:
       animais-terrestres:
         slot: 9
@@ -406,7 +408,7 @@ gui:
           - "&7Por chunk"
 
   criatura-itens:
-    tamanho: 27
+    tamanho: 45
     itens-por-pagina: 21
     padrao:
       titulo: "&f{criatura}"
@@ -422,6 +424,28 @@ gui:
       material: "ARROW"
       titulo: "&fVoltar"
       lore: []
+    criaturas-menu:
+      voltar:
+        slot: 22
+        material: "ARROW"
+        titulo: "&fVoltar ao menu principal"
+        lore: []
+    criaturas-pagina:
+      voltar:
+        slot: 40
+        material: "ARROW"
+        titulo: "&fVoltar para Criaturas"
+        lore: []
+      pagina-anterior:
+        slot: 38
+        material: "ARROW"
+        titulo: "&fPágina anterior"
+        lore: []
+      proxima-pagina:
+        slot: 42
+        material: "ARROW"
+        titulo: "&fPróxima página"
+        lore: []
     redstone:
       voltar:
         slot: 49
