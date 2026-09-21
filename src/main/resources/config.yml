@@ -191,21 +191,21 @@ gui:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       nether:
-        slot: 20
+        slot: 24
         material: "PLAYER_HEAD"
         titulo: "&4&lNether"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       end:
-        slot: 19
+        slot: 23
         material: "PLAYER_HEAD"
         titulo: "&5&lEnd"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       pillagers:
-        slot: 17
+        slot: 21
         material: "PLAYER_HEAD"
         titulo: "&6&lSaqueadores"
         lore:
@@ -226,14 +226,14 @@ gui:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       golems:
-        slot: 18
+        slot: 22
         material: "PLAYER_HEAD"
         titulo: "&f&lGolems"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       bosses:
-        slot: 21
+        slot: 25
         material: "PLAYER_HEAD"
         titulo: "&4&lChefes"
         lore:
