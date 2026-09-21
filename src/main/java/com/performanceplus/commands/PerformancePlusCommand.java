@@ -60,9 +60,11 @@ public class PerformancePlusCommand implements CommandExecutor, TabCompleter {
         }
         Chunk chunk = player.getLocation().getChunk();
         Metrics metrics = plugin.getMetricsManager().get(chunk);
-        m.send(sender, "comandos.chunk.titulo", Map.of(
+        m.send(sender, "comandos.chunk.titulo");
+        m.send(sender, "comandos.chunk.cabecalho", Map.of(
                 "{x}", String.valueOf(chunk.getX()),
                 "{z}", String.valueOf(chunk.getZ())));
+        m.send(sender, "comandos.chunk.mundo", Map.of("{mundo}", chunk.getWorld().getName()));
         m.send(sender, "comandos.chunk.mobs", Map.of("{valor}", String.valueOf(metrics.mobs())));
         m.send(sender, "comandos.chunk.entidades", Map.of("{valor}", String.valueOf(metrics.entities())));
         m.send(sender, "comandos.chunk.itens", Map.of("{valor}", String.valueOf(metrics.items())));
@@ -71,6 +73,7 @@ public class PerformancePlusCommand implements CommandExecutor, TabCompleter {
         m.send(sender, "comandos.chunk.spawners", Map.of("{valor}", String.valueOf(metrics.spawners())));
         m.send(sender, "comandos.chunk.pistoes", Map.of("{valor}", String.valueOf(metrics.pistons())));
         m.send(sender, "comandos.chunk.observers", Map.of("{valor}", String.valueOf(metrics.observers())));
+        m.send(sender, "comandos.chunk.rodape");
     }
 
     private void sendFarms(CommandSender sender) {
