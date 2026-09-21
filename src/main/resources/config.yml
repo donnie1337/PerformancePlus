@@ -546,7 +546,7 @@ performance:
 # Monitoramento
 # ============================================================
 monitoramento:
-  habilitado: true
+  habilitado: false
   alerta-mspt: 50.0
   intervalo-alertas-segundos: 30
   notificar-staff: true
