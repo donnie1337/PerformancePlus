@@ -118,13 +118,16 @@ public class LimitsCommand implements CommandExecutor, Listener {
         }
     }
 
+    // Somente limites reais de colocação por chunk. Os controles técnicos
+    // de atualizações por tick permanecem ativos no arquivo de configuração.
     private static final List<String> REDSTONE_KEYS = List.of(
-            "redstone", "suporte-armaduras", "carrinho-com-bau", "comparadores", "ejetores",
-            "liberadores", "carrinho-com-fornalha", "carrinho-com-funil", "hoppers",
-            "carrinho-de-mina", "observers", "pistoes", "pistoes-ativacoes-por-segundo",
-            "blocos-de-redstone", "lampadas-de-redstone", "tochas-de-redstone",
-            "po-de-redstone", "repetidores", "sensores-de-sculk", "catalisadores-de-sculk",
-            "emissores-de-sculk", "sinalizadores", "pistoes-com-slime", "carrinho-com-dinamite"
+            "po-de-redstone", "blocos-de-redstone", "tochas-de-redstone", "lampadas-de-redstone",
+            "comparadores", "repetidores", "ejetores", "liberadores", "hoppers",
+            "carrinho-com-funil", "carrinho-de-mina", "carrinho-com-bau",
+            "carrinho-com-fornalha", "carrinho-com-dinamite", "observers", "pistoes",
+            "pistoes-com-slime", "sensores-de-sculk", "catalisadores-de-sculk",
+            "emissores-de-sculk", "sinalizadores", "suporte-armaduras",
+            "redstone", "pistoes-ativacoes-por-segundo"
     );
 
     private static final List<String> GENERATOR_KEYS = List.of(
@@ -402,7 +405,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private String limitScopeLabel(String key) {
         return switch (key) {
-            case "redstone" -> "Limite por chunk/tick";
+            case "redstone" -> "Atualizações por chunk/tick";
             case "pistoes-ativacoes-por-segundo", "chunks-gerados-por-segundo" -> "Limite por segundo";
             default -> "Limite por chunk";
         };
@@ -418,7 +421,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private String formatLimitName(String key) {
         return switch (key) {
-            case "redstone" -> "Circuitos de redstone";
+            case "redstone" -> "Atualizações de redstone";
             case "suporte-armaduras" -> "Suporte de armaduras";
             case "carrinho-com-bau" -> "Carrinho com baú";
             case "comparadores" -> "Comparadores";
