@@ -432,7 +432,9 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private boolean isLimitPageTitle(String title, String page) {
-        return color(guiString("paginas." + page, "titulo", "&8&lLimites")).equals(title);
+        if (title == null) return false;
+        String configuredTitle = guiString("paginas." + page, "titulo", "&8&lLimites");
+        return color(configuredTitle).equals(title);
     }
 
     private boolean isLimitsInventory(String title) {
