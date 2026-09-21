@@ -36,6 +36,11 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+        if (args.length == 1 && args[0].equalsIgnoreCase("chunk")) {
+            new PerformancePlusCommand(plugin).sendChunkInfo(sender);
+            return true;
+        }
+
         if (!(sender instanceof Player player)) {
             plugin.getMessageManager().send(sender, "comandos.apenas-jogador");
             return true;
