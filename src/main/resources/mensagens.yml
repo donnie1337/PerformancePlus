@@ -47,10 +47,10 @@ comandos:
     item: "&7• &f{valor}"
 
   ajuda:
-    status: "&f/limite status &7- Status de performance"
-    chunk: "&f/limite chunk &7- Limites e contadores do chunk atual"
-    farms: "&f/limite farms &7- Chunks com alta concentração"
-    reload: "&f/limite reload &7- Recarrega o config.yml e mensagens.yml"
+    status: "&f/performanceplus status &7- Status de performance"
+    chunk: "&f/limite chunk &7- Contadores do chunk atual"
+    farms: "&f/performanceplus farms &7- Chunks com alta concentração"
+    reload: "&f/performanceplus reload &7- Recarrega o config.yml e mensagens.yml"
 
 limites:
   entidades: "&cLimite de entidades deste chunk atingido."
