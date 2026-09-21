@@ -437,8 +437,10 @@ gui:
       voltar:
         slot: 40
         material: "ARROW"
-        titulo: "&fVoltar ao menu principal"
-        lore: []
+        titulo: "&cVoltar"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar ao menu principal."
     criaturas-pagina:
       voltar:
         slot: 48
