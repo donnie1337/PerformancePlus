@@ -431,8 +431,10 @@ gui:
     voltar:
       slot: 49
       material: "ARROW"
-      titulo: "&fVoltar"
-      lore: []
+      titulo: "&cVoltar"
+      lore:
+        - ""
+        - "&7Clique aqui para voltar ao menu principal."
     criaturas-menu:
       voltar:
         slot: 40
@@ -445,52 +447,70 @@ gui:
       voltar:
         slot: 48
         material: "ARROW"
-        titulo: "&fVoltar para Criaturas"
-        lore: []
+        titulo: "&cVoltar"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar ao menu de criaturas."
       pagina-anterior:
         slot: 31
         material: "ARROW"
-        titulo: "&fPágina anterior"
-        lore: []
+        titulo: "&cPágina anterior"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar à página anterior."
       proxima-pagina:
         slot: 50
         material: "ARROW"
-        titulo: "&fPróxima página"
-        lore: []
+        titulo: "&aPróxima página"
+        lore:
+          - ""
+          - "&7Clique aqui para avançar para a próxima página."
     redstone:
       voltar:
         slot: 49
         material: "ARROW"
-        titulo: "&fVoltar"
-        lore: []
+        titulo: "&cVoltar"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar ao menu principal."
     geradores:
       voltar:
         slot: 22
         material: "ARROW"
-        titulo: "&fVoltar"
-        lore: []
+        titulo: "&cVoltar"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar ao menu principal."
     decoracoes:
       voltar:
         slot: 22
         material: "ARROW"
-        titulo: "&fVoltar"
-        lore: []
+        titulo: "&cVoltar"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar ao menu principal."
     criaturas:
       voltar:
         slot: 22
         material: "ARROW"
-        titulo: "&fVoltar"
-        lore: []
+        titulo: "&cVoltar"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar ao menu principal."
       pagina-anterior:
         slot: 21
         material: "ARROW"
-        titulo: "&fPágina anterior"
-        lore: []
+        titulo: "&cPágina anterior"
+        lore:
+          - ""
+          - "&7Clique aqui para voltar à página anterior."
       proxima-pagina:
         slot: 23
         material: "ARROW"
-        titulo: "&fPróxima página"
-        lore: []
+        titulo: "&aPróxima página"
+        lore:
+          - ""
+          - "&7Clique aqui para avançar para a próxima página."
 
 # ============================================================
 # Proteção adaptativa
