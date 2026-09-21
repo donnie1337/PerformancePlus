@@ -218,10 +218,10 @@ gui:
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
-      cavalos-especiais:
+      monstros-especiais:
         slot: 15
         material: "PLAYER_HEAD"
-        titulo: "&d&lCavalos especiais"
+        titulo: "&d&lMonstros especiais"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
