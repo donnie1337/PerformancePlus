@@ -30,19 +30,6 @@ public class LimitsCommand implements CommandExecutor, Listener {
             new Category("decoracoes", Material.ARMOR_STAND)
     };
 
-    private static final CreatureCategory[] CREATURE_CATEGORIES = {
-            new CreatureCategory("animais-terrestres", "cow", "sheep", "pig", "chicken", "horse", "donkey", "mule", "rabbit", "fox", "wolf"),
-            new CreatureCategory("animais-aquaticos", "cod", "salmon", "tropical_fish", "pufferfish", "squid", "glow_squid", "dolphin", "turtle", "axolotl", "guardian"),
-            new CreatureCategory("monstros-comuns", "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime", "phantom", "enderman", "silverfish"),
-            new CreatureCategory("nether", "blaze", "ghast", "magma_cube", "piglin", "piglin_brute", "zombified_piglin", "hoglin", "zoglin", "wither_skeleton", "strider"),
-            new CreatureCategory("end", "enderman", "shulker", "ender_dragon"),
-            new CreatureCategory("pillagers", "pillager", "vindicator", "evoker", "ravager", "illusioner"),
-            new CreatureCategory("aldeoes-traders", "villager", "wandering_trader"),
-            new CreatureCategory("cavalos-especiais", "horse", "donkey", "mule", "skeleton_horse", "zombie_horse", "camel"),
-            new CreatureCategory("golems", "iron_golem", "snow_golem"),
-            new CreatureCategory("bosses", "wither", "ender_dragon")
-    };
-
     public LimitsCommand(PerformancePlus plugin) {
         this.plugin = plugin;
     }
@@ -156,68 +143,107 @@ public class LimitsCommand implements CommandExecutor, Listener {
         player.openInventory(inventory);
     }
 
+    private static final List<String> HOSTILE_MOBS = List.of(
+            "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime",
+            "phantom", "enderman", "silverfish", "endermite", "blaze", "ghast", "magma_cube",
+            "piglin", "piglin_brute", "zombified_piglin", "hoglin", "zoglin", "wither_skeleton",
+            "shulker", "guardian", "elder_guardian", "drowned", "husk", "stray", "bogged",
+            "pillager", "vindicator", "evoker", "illusioner", "ravager", "vex", "warden",
+            "wither", "ender_dragon", "breeze", "creaking", "zombie_villager"
+    );
+
+    private static final List<String> ANIMALS = List.of(
+            "cow", "sheep", "pig", "chicken", "horse", "donkey", "mule", "rabbit", "fox",
+            "wolf", "cat", "panda", "mooshroom", "goat", "polar_bear", "turtle", "dolphin",
+            "squid", "glow_squid", "cod", "salmon", "tropical_fish", "pufferfish", "axolotl",
+            "frog", "tadpole", "bat", "bee", "parrot", "allay", "sniffer", "armadillo",
+            "camel", "llama", "ocelot", "strider"
+    );
+
+    private static final int[] HEAD_SLOTS = {
+            10, 11, 12, 13, 14, 15, 16,
+            19, 20, 21, 22, 23, 24, 25,
+            28, 29, 30, 31, 32, 33, 34
+    };
+
     private void openCreatureCategories(Player player) {
         String path = "criaturas";
         int size = guiInt(path, "tamanho", 27);
         String title = guiString(path, "titulo", "&8&lLimites &8• &aCriaturas");
         Inventory inventory = Bukkit.createInventory(null, size, color(title));
 
-        for (CreatureCategory category : CREATURE_CATEGORIES) {
-            String categoryPath = path + ".categorias." + category.key;
-            int slot = guiInt(categoryPath, "slot", -1);
-            if (slot < 0 || slot >= size) continue;
-            inventory.setItem(slot, createConfiguredItem(categoryPath, defaultCreatureCategoryMaterial(category), category.key,
-                    List.of("&7Clique para visualizar os limites.", "&7Cada criatura possui limite e raio próprios."), -1));
-        }
+        ItemStack criaturas = criarCabecaCombatePlus("skeleton", "&f&lCriaturas",
+                List.of("&7Clique para visualizar as criaturas hostis."));
+        ItemStack animais = criarCabecaCombatePlus("panda", "&a&lAnimais",
+                List.of("&7Clique para visualizar os animais."));
 
+        inventory.setItem(guiInt(path, "criaturas-slot", 11), criaturas);
+        inventory.setItem(guiInt(path, "animais-slot", 15), animais);
+
+        setNavigation(inventory, "criaturas-menu", "voltar");
         player.openInventory(inventory);
     }
 
-    private void openCreaturePage(Player player, CreatureCategory category, int page) {
-        String path = "criatura-itens";
-        int size = guiInt(path, "tamanho", 27);
-        String title = guiString("criatura-paginas." + category.key, "titulo",
-                guiString("criaturas.categorias." + category.key, "titulo", "&8&lLimites"));
-        Inventory inventory = Bukkit.createInventory(null, size, color(title));
+    private void openCreaturePage(Player player, boolean animais, int page) {
+        List<String> entries = animais ? ANIMALS : HOSTILE_MOBS;
+        String type = animais ? "animais" : "hostis";
+        int perPage = HEAD_SLOTS.length;
+        int maxPage = Math.max(0, (entries.size() - 1) / perPage);
+        page = Math.max(0, Math.min(page, maxPage));
 
-        int perPage = Math.max(1, guiInt(path, "itens-por-pagina", 21));
+        String path = "criatura-itens";
+        int size = guiInt(path, "tamanho", 45);
+        String title = guiString(path, animais ? "titulo-animais" : "titulo-criaturas",
+                animais ? "&8&lLimites &8• &aAnimais" : "&8&lLimites &8• &cMobs hostis");
+
+        Inventory inventory = Bukkit.createInventory(null, size,
+                color(title + " &8• &7" + (page + 1) + "/" + (maxPage + 1)));
+
         int start = page * perPage;
-        int end = Math.min(start + perPage, category.mobs.size());
+        int end = Math.min(start + perPage, entries.size());
 
         for (int i = start; i < end; i++) {
-            String mob = category.mobs.get(i);
-            String itemPath = path + "." + mob;
-            int defaultSlot = i - start;
-            int slot = guiInt(itemPath, "slot", defaultSlot);
-            if (slot < 0 || slot >= size) continue;
-
-            Material material = resolveSpawnEgg(mob);
-            String defaultTitle = "&f" + formatMobName(mob);
-            List<String> defaultLore = List.of("&7Limite: &fNão configurado", "&7Raio: &fNão configurado", "", "&8Configuração individual por criatura.");
-            inventory.setItem(slot, createCreatureItem(itemPath, material, defaultLore, defaultTitle));
+            String mob = entries.get(i);
+            int slot = HEAD_SLOTS[i - start];
+            ItemStack head = criarCabecaCombatePlus(mob, "&f&l" + formatMobName(mob),
+                    List.of(
+                            "&7Limite por chunk: &f" + currentLimit(player, mob)
+                    ));
+            inventory.setItem(slot, head);
         }
 
-        if (page > 0) setNavigation(inventory, "criaturas", "pagina-anterior");
-        setNavigation(inventory, "criaturas", "voltar");
-        if (end < category.mobs.size()) setNavigation(inventory, "criaturas", "proxima-pagina");
+        setNavigation(inventory, "criaturas-pagina", "voltar");
+        if (page > 0) setNavigation(inventory, "criaturas-pagina", "pagina-anterior");
+        if (page < maxPage) setNavigation(inventory, "criaturas-pagina", "proxima-pagina");
 
         player.openInventory(inventory);
     }
 
-    private ItemStack createCreatureItem(String itemPath, Material material, List<String> fallbackLore, String fallbackTitle) {
-        String defaultPath = "criatura-itens.padrao";
-        Material configuredMaterial = guiMaterial(itemPath, "material", guiMaterial(defaultPath, "material", material));
-        String title = guiString(itemPath, "titulo", guiString(defaultPath, "titulo", fallbackTitle));
-        List<String> lore = guiLore(itemPath, "lore", guiLore(defaultPath, "lore", fallbackLore));
-        List<String> parsedLore = new ArrayList<>();
-        for (String line : lore) {
-            parsedLore.add(color(line.replace("{criatura}", fallbackTitle.replace("&f", ""))));
+    private ItemStack criarCabecaCombatePlus(String nome, String titulo, List<String> lore) {
+        ItemStack item = null;
+        try {
+            org.bukkit.plugin.Plugin combate = Bukkit.getPluginManager().getPlugin("CombatePlus");
+            if (combate != null) {
+                Object manager = combate.getClass().getMethod("getCabecasManager").invoke(combate);
+                if (manager != null) {
+                    Object resultado = manager.getClass().getMethod("criarCabecaPorNome", String.class).invoke(manager, nome);
+                    if (resultado instanceof ItemStack stack) {
+                        item = stack.clone();
+                    }
+                }
+            }
+        } catch (ReflectiveOperationException exception) {
+            plugin.getLogger().warning("Não foi possível acessar o sistema de cabeças do CombatePlus.");
         }
-        ItemStack item = new ItemStack(configuredMaterial);
+
+        if (item == null) {
+            item = new ItemStack(Material.PLAYER_HEAD);
+        }
+
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
-            meta.setDisplayName(color(title));
-            meta.setLore(parsedLore);
+            meta.setDisplayName(color(titulo));
+            meta.setLore(lore.stream().map(this::color).toList());
             item.setItemMeta(meta);
         }
         return item;
@@ -250,7 +276,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private void setNavigation(Inventory inventory, String page, String key) {
         String specificPath = "navegacao." + page + "." + key;
         String path = gui(specificPath) != null ? specificPath : "navegacao." + key;
-        int slot = guiInt(path, "slot", key.equals("voltar") ? (inventory.getSize() - 5) : key.equals("pagina-anterior") ? 21 : 23);
+        int slot = guiInt(path, "slot", key.equals("voltar") ? (inventory.getSize() - 5) : key.equals("pagina-anterior") ? 38 : 42);
         if (slot < 0 || slot >= inventory.getSize()) return;
         Material material = guiMaterial(path, "material", Material.ARROW);
         String title = guiString(path, "titulo", "&fVoltar");
@@ -291,30 +317,6 @@ public class LimitsCommand implements CommandExecutor, Listener {
         };
     }
 
-    private Material defaultCreatureCategoryMaterial(CreatureCategory category) {
-        return switch (category.key) {
-            case "animais-terrestres" -> Material.COW_SPAWN_EGG;
-            case "animais-aquaticos" -> Material.COD_SPAWN_EGG;
-            case "monstros-comuns" -> Material.ZOMBIE_SPAWN_EGG;
-            case "nether" -> Material.BLAZE_SPAWN_EGG;
-            case "end" -> Material.ENDERMAN_SPAWN_EGG;
-            case "pillagers" -> Material.PILLAGER_SPAWN_EGG;
-            case "aldeoes-traders" -> Material.VILLAGER_SPAWN_EGG;
-            case "cavalos-especiais" -> Material.HORSE_SPAWN_EGG;
-            case "golems" -> Material.IRON_GOLEM_SPAWN_EGG;
-            case "bosses" -> Material.WITHER_SPAWN_EGG;
-            default -> Material.CHEST;
-        };
-    }
-
-    private Material resolveSpawnEgg(String mob) {
-        try {
-            return Material.valueOf(mob.toUpperCase() + "_SPAWN_EGG");
-        } catch (IllegalArgumentException ignored) {
-            return Material.PLAYER_HEAD;
-        }
-    }
-
     private String formatMobName(String mob) {
         String[] parts = mob.split("_");
         StringBuilder result = new StringBuilder();
@@ -337,18 +339,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
         return color(guiString("criaturas", "titulo", "&8&lLimites &8• &aCriaturas")).equals(title);
     }
 
-    private boolean isLimitPageTitle(String title, String page) {
-        return color(guiString("paginas." + page, "titulo", "&8&lLimites")).equals(title);
-    }
-
-    private CreatureCategory findCreatureCategory(String title) {
-        for (CreatureCategory category : CREATURE_CATEGORIES) {
-            String configured = guiString("criatura-paginas." + category.key, "titulo", "");
-            if (!configured.isEmpty() && color(configured).equals(title)) return category;
-            String fallback = guiString("criaturas.categorias." + category.key, "titulo", "");
-            if (!fallback.isEmpty() && color(fallback).equals(title)) return category;
-        }
-        return null;
+    private boolean isCreaturePageTitle(String title) {
+        if (title == null) return false;
+        return title.startsWith(color("&8&lLimites &8• &cMobs hostis"))
+                || title.startsWith(color("&8&lLimites &8• &aAnimais"));
     }
 
     @EventHandler
@@ -379,44 +373,71 @@ public class LimitsCommand implements CommandExecutor, Listener {
         }
 
         if (isCategoryTitle(title)) {
-            for (CreatureCategory category : CREATURE_CATEGORIES) {
-                String path = "criaturas.categorias." + category.key;
-                if (slot == guiInt(path, "slot", -1)) {
-                    openCreaturePage(player, category, 0);
-                    return;
-                }
+            if (slot == guiInt("criaturas", "criaturas-slot", 11)) {
+                openCreaturePage(player, false, 0);
+                return;
+            }
+            if (slot == guiInt("criaturas", "animais-slot", 15)) {
+                openCreaturePage(player, true, 0);
+                return;
+            }
+            if (slot == guiInt("navegacao.criaturas-menu.voltar", "slot", 22)
+                    || slot == guiInt("navegacao.voltar", "slot", 49)) {
+                openMain(player);
+            }
+            return;
+        }
+
+        if (isCreaturePageTitle(title)) {
+            boolean animais = title.startsWith(color("&8&lLimites &8• &aAnimais"));
+            int page = extrairPagina(title);
+            List<String> entries = animais ? ANIMALS : HOSTILE_MOBS;
+            int maxPage = Math.max(0, (entries.size() - 1) / HEAD_SLOTS.length);
+
+            if (slot == guiInt("navegacao.criaturas-pagina.voltar", "slot", 40)
+                    || slot == guiInt("navegacao.voltar", "slot", 49)) {
+                openCreatureCategories(player);
+                return;
+            }
+            if (slot == guiInt("navegacao.criaturas-pagina.pagina-anterior", "slot", 38)) {
+                openCreaturePage(player, animais, Math.max(0, page - 1));
+                return;
+            }
+            if (slot == guiInt("navegacao.criaturas-pagina.proxima-pagina", "slot", 42)) {
+                if (page < maxPage) openCreaturePage(player, animais, page + 1);
             }
             return;
         }
 
         if (isLimitPageTitle(title, "redstone") || isLimitPageTitle(title, "geradores") || isLimitPageTitle(title, "decoracoes")) {
-            if (slot == guiInt("navegacao.redstone.voltar", "slot", guiInt("navegacao.voltar", "slot", 49)) || slot == guiInt("navegacao.geradores.voltar", "slot", guiInt("navegacao.voltar", "slot", 49)) || slot == guiInt("navegacao.decoracoes.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))) openMain(player);
-            return;
-        }
-
-        CreatureCategory creatureCategory = findCreatureCategory(title);
-        if (creatureCategory != null) {
-            if (slot == guiInt("navegacao.criaturas.voltar", "slot", 22) || slot == guiInt("navegacao.voltar", "slot", 49)) {
-                openCreatureCategories(player);
-                return;
-            }
-            if (slot == guiInt("navegacao.criaturas.pagina-anterior", "slot", 21)) {
-                openCreaturePage(player, creatureCategory, 0);
-                return;
-            }
-            if (slot == guiInt("navegacao.criaturas.proxima-pagina", "slot", 23)) {
-                openCreaturePage(player, creatureCategory, 1);
+            if (slot == guiInt("navegacao.redstone.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))
+                    || slot == guiInt("navegacao.geradores.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))
+                    || slot == guiInt("navegacao.decoracoes.voltar", "slot", guiInt("navegacao.voltar", "slot", 49))) {
+                openMain(player);
             }
         }
     }
 
-    private boolean isLimitsInventory(String title) {
+    private int extrairPagina(String title) {
+        int separator = title.lastIndexOf(" • ");
+        if (separator < 0) return 0;
+        String pagePart = title.substring(separator + 3);
+        int slash = pagePart.indexOf('/');
+        if (slash < 0) return 0;
+        try {
+            return Math.max(0, Integer.parseInt(pagePart.substring(0, slash)) - 1);
+        } catch (NumberFormatException ignored) {
+            return 0;
+        }
+    }
+
+    private boolean isLimitPageTitle(String title, String page) {\n        return color(guiString("paginas." + page, "titulo", "&8&lLimites")).equals(title);\n    }\n\n    private boolean isLimitsInventory(String title) {
         if (title == null) return false;
-        if (isMainTitle(title) || isCategoryTitle(title)
+        return isMainTitle(title) || isCategoryTitle(title)
                 || isLimitPageTitle(title, "redstone")
                 || isLimitPageTitle(title, "geradores")
-                || isLimitPageTitle(title, "decoracoes")) return true;
-        return findCreatureCategory(title) != null;
+                || isLimitPageTitle(title, "decoracoes")
+                || isCreaturePageTitle(title);
     }
 
     private record Category(String key, Material material) {}
