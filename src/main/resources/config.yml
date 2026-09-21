@@ -170,70 +170,70 @@ gui:
     tamanho: 45
     categorias:
       animais-terrestres:
-        slot: 10
+        slot: 12
         material: "PANDA"
         titulo: "&a&lAnimais terrestres"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       animais-aquaticos:
-        slot: 11
+        slot: 13
         material: "PLAYER_HEAD"
         titulo: "&b&lAnimais aquáticos"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       monstros:
-        slot: 12
+        slot: 14
         material: "ZOMBIE_HEAD"
         titulo: "&c&lMonstros"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       nether:
-        slot: 19
+        slot: 20
         material: "PLAYER_HEAD"
         titulo: "&4&lNether"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       end:
-        slot: 20
+        slot: 19
         material: "PLAYER_HEAD"
         titulo: "&5&lEnd"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       pillagers:
-        slot: 21
+        slot: 17
         material: "PLAYER_HEAD"
         titulo: "&6&lSaqueadores"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       aldeoes-traders:
-        slot: 22
+        slot: 15
         material: "PLAYER_HEAD"
         titulo: "&e&lAldeões e Comerciantes"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       cavalos-especiais:
-        slot: 23
+        slot: 16
         material: "PLAYER_HEAD"
         titulo: "&d&lCavalos especiais"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       golems:
-        slot: 24
+        slot: 18
         material: "PLAYER_HEAD"
         titulo: "&f&lGolems"
         lore:
           - "&7Clique para visualizar os limites."
           - "&7Cada criatura possui limite e raio próprios."
       bosses:
-        slot: 25
+        slot: 21
         material: "PLAYER_HEAD"
         titulo: "&4&lChefes"
         lore:
