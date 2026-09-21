@@ -407,6 +407,7 @@ gui:
 
   criatura-itens:
     tamanho-primeira-pagina: 54
+    tamanho-pagina-unica: 45
     tamanho-outras-paginas: 36
     itens-por-pagina: 21
     padrao:
