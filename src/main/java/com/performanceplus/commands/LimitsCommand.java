@@ -88,7 +88,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
             String path = "principal.categorias." + category.key;
             int slot = guiInt(path, "slot", -1);
             if (slot < 0 || slot >= size) continue;
-            inventory.setItem(slot, createConfiguredItem(path, category.material, category.key, List.of("&7Clique para visualizar os limites."), -1));
+            ItemStack icon = category.key.equals("criaturas")
+                    ? criarCabecaCombatePlus("zombie", "&a&lCriaturas", List.of("&7Clique para visualizar os limites."))
+                    : createConfiguredItem(path, category.material, category.key, List.of("&7Clique para visualizar os limites."), -1);
+            inventory.setItem(slot, icon);
         }
 
         player.openInventory(inventory);
