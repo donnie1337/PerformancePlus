@@ -141,125 +141,143 @@ farm:
 # Slots começam em 0.
 gui:
   principal:
-    titulo: "&8&lLimites"
+    titulo: "&8Limites"
     tamanho: 27
     categorias:
       redstone:
         slot: 10
         material: "REDSTONE"
-        titulo: "&c&lRedstone"
+        titulo: "&cRedstone"
         lore:
-          - "&7Clique para visualizar os limites."
+          - ""
+          - "&7Circuitos, mecanismos e componentes."
+          - "&8Limites aplicados por chunk."
       criaturas:
         slot: 12
         material: "ZOMBIE_HEAD"
-        titulo: "&a&lCriaturas"
+        titulo: "&aCriaturas"
         lore:
-          - "&7Clique para visualizar os limites."
+          - ""
+          - "&7Animais e monstros do servidor."
+          - "&8Limites aplicados por proximidade."
       geradores:
         slot: 14
         material: "SPAWNER"
-        titulo: "&5&lGeradores"
+        titulo: "&5Geradores"
         lore:
-          - "&7Clique para visualizar os limites."
+          - ""
+          - "&7Spawners e geração de novos chunks."
+          - "&8Limites configurados para proteção."
       decoracoes:
         slot: 16
         material: "ARMOR_STAND"
-        titulo: "&e&lDecorações"
+        titulo: "&eDecorações"
         lore:
-          - "&7Clique para visualizar os limites."
+          - ""
+          - "&7Entidades, itens e orbes de XP."
+          - "&8Organize os limites do seu mundo."
 
   paginas:
     redstone:
-      titulo: "&8&lLimites &8• &cRedstone"
+      titulo: "&8Limites &8• &cRedstone"
       tamanho-primeira-pagina: 54
       tamanho-pagina-unica: 45
       tamanho-outras-paginas: 36
     geradores:
-      titulo: "&8&lLimites &8• &5Geradores"
+      titulo: "&8Limites &8• &5Geradores"
       tamanho-primeira-pagina: 54
-      tamanho-pagina-unica: 45
+      tamanho-pagina-unica: 36
       tamanho-outras-paginas: 36
     decoracoes:
-      titulo: "&8&lLimites &8• &eDecorações"
+      titulo: "&8Limites &8• &eDecorações"
       tamanho-primeira-pagina: 54
       tamanho-pagina-unica: 45
       tamanho-outras-paginas: 36
 
   criaturas:
-    titulo: "&8&lLimites &8• &aCriaturas"
+    titulo: "&8Limites &8• &aCriaturas"
     tamanho: 45
     categorias:
       animais-terrestres:
         slot: 11
         material: "PANDA"
-        titulo: "&a&lAnimais terrestres"
+        titulo: "&aAnimais terrestres"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       animais-aquaticos:
         slot: 12
         material: "PLAYER_HEAD"
-        titulo: "&b&lAnimais aquáticos"
+        titulo: "&bAnimais aquáticos"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       monstros:
         slot: 13
         material: "ZOMBIE_HEAD"
-        titulo: "&c&lMonstros"
+        titulo: "&cMonstros"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       nether:
         slot: 23
         material: "PLAYER_HEAD"
-        titulo: "&4&lNether"
+        titulo: "&4Nether"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       end:
         slot: 22
         material: "PLAYER_HEAD"
-        titulo: "&5&lEnd"
+        titulo: "&5End"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       pillagers:
         slot: 20
         material: "PLAYER_HEAD"
-        titulo: "&6&lSaqueadores"
+        titulo: "&6Saqueadores"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       aldeoes-traders:
         slot: 14
         material: "PLAYER_HEAD"
-        titulo: "&e&lAldeões e Comerciantes"
+        titulo: "&eAldeões e Comerciantes"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       monstros-especiais:
         slot: 15
         material: "PLAYER_HEAD"
-        titulo: "&d&lMonstros especiais"
+        titulo: "&dMonstros especiais"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       golems:
         slot: 21
         material: "PLAYER_HEAD"
-        titulo: "&f&lGolems"
+        titulo: "&fGolems"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
       bosses:
         slot: 24
         material: "PLAYER_HEAD"
-        titulo: "&4&lChefes"
+        titulo: "&4Chefes"
         lore:
+          - ""
           - "&7Clique para visualizar os limites."
-          - "&7Cada criatura possui limite e raio próprios."
+          - "&8Limites por proximidade e raio próprios."
 
   itens:
     redstone:
@@ -485,6 +503,18 @@ gui:
         lore:
           - ""
           - "&7Clique aqui para voltar ao menu principal."
+      pagina-anterior:
+        slot: 31
+        material: "ARROW"
+        titulo: "&cVoltar"
+        lore:
+          - "&7Clique aqui para voltar a página anterior."
+      proxima-pagina:
+        slot: 50
+        material: "ARROW"
+        titulo: "&aPróxima página"
+        lore:
+          - "&7Clique aqui para ir para a próxima página."
     geradores:
       voltar:
         slot: 22

@@ -82,7 +82,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private String mainTitle() {
-        return guiString("principal", "titulo", "&8&lLimites");
+        return guiString("principal", "titulo", "&8Limites");
     }
 
     private void openMain(Player player) {
@@ -143,7 +143,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
                 ? guiInt(path, hasNextPage ? "tamanho-primeira-pagina" : "tamanho-pagina-unica",
                         hasNextPage ? FIRST_CREATURE_PAGE_SIZE : SINGLE_CREATURE_PAGE_SIZE)
                 : guiInt(path, "tamanho-outras-paginas", OTHER_CREATURE_PAGE_SIZE);
-        String title = guiString(path, "titulo", "&8&lLimites");
+        String title = guiString(path, "titulo", "&8Limites");
         Inventory inventory = Bukkit.createInventory(null, size,
                 color(title + " &8• &7" + (page + 1) + "/" + (maxPage + 1)));
 
@@ -157,7 +157,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
         int leftArrowSlot;
         if (page == 0) {
-            leftArrowSlot = hasNextPage ? CREATURE_BACK_SLOT : SINGLE_CREATURE_BACK_SLOT;
+            leftArrowSlot = hasNextPage ? CREATURE_BACK_SLOT
+                    : size <= OTHER_CREATURE_PAGE_SIZE ? CREATURE_PREVIOUS_SLOT : SINGLE_CREATURE_BACK_SLOT;
             setNavigation(inventory, pageKey, "voltar", leftArrowSlot);
             if (page < maxPage) {
                 setNavigation(inventory, pageKey, "proxima-pagina", CREATURE_NEXT_SLOT);
@@ -233,7 +234,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private void openCreatureCategories(Player player) {
         String path = "criaturas";
         int size = guiInt(path, "tamanho", 45);
-        String title = guiString(path, "titulo", "&8&lLimites &8• &aCriaturas");
+        String title = guiString(path, "titulo", "&8Limites &8• &aCriaturas");
         Inventory inventory = Bukkit.createInventory(null, size, color(title));
 
         for (int i = 0; i < CREATURE_CATEGORIES.length; i++) {
@@ -244,12 +245,18 @@ public class LimitsCommand implements CommandExecutor, Listener {
             String itemPath = path + ".categorias." + category.key;
             inventory.setItem(slot, criarCabecaCombatePlus(
                     category.headMob,
-                    category.title,
-                    List.of("&7Clique para visualizar os limites.")
+                    guiString(itemPath, "titulo", category.title),
+                    guiLore(itemPath, "lore", List.of(
+                            "",
+                            "&7Clique para visualizar os limites.",
+                            "&8Limites por proximidade."
+                    ))
             ));
         }
 
-        setNavigation(inventory, "criaturas-menu", "voltar");
+        int backSlot = guiInt("navegacao.criaturas-menu.voltar", "slot", SINGLE_CREATURE_BACK_SLOT);
+        setNavigation(inventory, "criaturas-menu", "voltar", backSlot);
+        setChunkInformationBook(inventory, backSlot - 2);
         player.openInventory(inventory);
     }
 
@@ -266,7 +273,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
                         hasNextPage ? FIRST_CREATURE_PAGE_SIZE : SINGLE_CREATURE_PAGE_SIZE)
                 : guiInt(path, "tamanho-outras-paginas", OTHER_CREATURE_PAGE_SIZE);
         String title = guiString(path, "titulo-" + category.key,
-                "&8&lLimites &8• " + category.title);
+                "&8Limites &8• " + category.title);
 
         Inventory inventory = Bukkit.createInventory(null, size,
                 color(title + " &8• &7" + (page + 1) + "/" + (maxPage + 1)));
@@ -316,7 +323,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
         if (title == null) return null;
         for (CreatureCategory category : CREATURE_CATEGORIES) {
             String base = color(guiString("criatura-itens", "titulo-" + category.key,
-                    "&8&lLimites &8• " + category.title));
+                    "&8Limites &8• " + category.title));
             if (title.startsWith(base)) return category;
         }
         return null;
@@ -569,7 +576,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private boolean isCategoryTitle(String title) {
-        return color(guiString("criaturas", "titulo", "&8&lLimites &8• &aCriaturas")).equals(title);
+        return color(guiString("criaturas", "titulo", "&8Limites &8• &aCriaturas")).equals(title);
     }
 
     private boolean isCreaturePageTitle(String title) {
@@ -683,7 +690,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private String findLimitPageByTitle(String title) {
         if (title == null) return null;
         for (String page : List.of("redstone", "geradores", "decoracoes")) {
-            String configuredTitle = color(guiString("paginas." + page, "titulo", "&8&lLimites"));
+            String configuredTitle = color(guiString("paginas." + page, "titulo", "&8Limites"));
             if (title.startsWith(configuredTitle)) return page;
         }
         return null;
