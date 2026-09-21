@@ -254,7 +254,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             int slot = HEAD_SLOTS[i - startIndex];
             ItemStack head = criarCabecaCombatePlus(
                     mob,
-                    "&f&l" + formatMobName(mob),
+                    "&f" + formatMobName(mob),
                     List.of("&7Limite por chunk: &f" + currentLimit(player, mob))
             );
             inventory.setItem(slot, head);
