@@ -34,16 +34,16 @@ permissions:
     default: op
   performanceplus.bypass.spawners:
     description: Ignora o limite de spawners
-    default: op
+    default: false
   performanceplus.bypass.hoppers:
     description: Ignora o limite de hoppers
-    default: op
+    default: false
   performanceplus.bypass.pistoes:
     description: Ignora o limite de pistões
-    default: op
+    default: false
   performanceplus.bypass.observers:
     description: Ignora o limite de observers
-    default: op
+    default: false
   performanceplus.bypass.componentes:
     description: Ignora os limites dos componentes de redstone e decorações
-    default: op
+    default: false
