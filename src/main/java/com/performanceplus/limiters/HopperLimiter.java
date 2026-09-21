@@ -75,7 +75,7 @@ public class HopperLimiter implements Listener {
     }
 
     private int getLimit(Chunk chunk, String key, int fallback) {
-        return plugin.getConfigManager().getLimit(chunk.getWorld(), key, fallback);
+        return plugin.getConfigManager().getFixedLimit(chunk.getWorld(), key, fallback);
     }
 
     private int countHopperBlocks(Chunk chunk) {

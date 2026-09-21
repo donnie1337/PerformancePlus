@@ -26,7 +26,7 @@ public class ObserverController implements Listener {
         Player player = event.getPlayer();
         if (player.hasPermission("performanceplus.bypass.observers")) return;
 
-        int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "observers", 12);
+        int limit = plugin.getConfigManager().getFixedLimit(chunk.getWorld(), "observers", 12);
         if (limit <= 0) return;
         Metrics m = plugin.getMetricsManager().get(chunk);
         if (m.observers() >= limit) {

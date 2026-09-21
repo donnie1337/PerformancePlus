@@ -27,6 +27,14 @@ public class ConfigManager {
     }
 
     /**
+     * Retorna o valor exatamente como está configurado, sem a redução
+     * temporária da proteção adaptativa. Usado nos limites de colocação.
+     */
+    public int getFixedLimit(World world, String key, int def) {
+        return getRawLimit(world, key, def);
+    }
+
+    /**
      * Retorna o limite de uma criatura. Se não houver valor específico, usa
      * o limite padrão de mobs definido em limites.mobs.valor.
      */

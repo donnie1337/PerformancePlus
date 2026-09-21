@@ -133,7 +133,7 @@ public class ComponentLimiter implements Listener {
     }
 
     private int limit(Chunk chunk, String key) {
-        return plugin.getConfigManager().getLimit(chunk.getWorld(), key, 0);
+        return plugin.getConfigManager().getFixedLimit(chunk.getWorld(), key, 0);
     }
 
     private int blockCount(Chunk chunk, String key) {
