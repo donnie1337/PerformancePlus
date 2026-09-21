@@ -73,7 +73,7 @@ public class PerformancePlus extends JavaPlugin {
 
     private void registerCommands() {
         PerformancePlusCommand commandExecutor = new PerformancePlusCommand(this);
-        PluginCommand command = getCommand("performanceplus");
+        PluginCommand command = getCommand("limite");
         if (command != null) {
             command.setExecutor(commandExecutor);
             command.setTabCompleter(commandExecutor);
