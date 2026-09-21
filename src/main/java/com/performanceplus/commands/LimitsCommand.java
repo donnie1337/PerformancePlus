@@ -159,9 +159,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
                     "pufferfish", "salmon", "squid", "tadpole", "tropical_fish", "turtle", "nautilus"
             )),
             new CreatureCategory("monstros", "&cMonstros", "zombie", List.of(
-                    "drowned", "zombie_villager", "spider", "cave_spider", "breeze", "witch", "creaking",
-                    "creeper", "endermite", "skeleton", "bogged", "stray", "phantom", "guardian",
-                    "elder_guardian", "slime", "silverfish", "warden", "zombie", "husk"
+                    "zombie_villager", "spider", "cave_spider", "breeze", "witch", "creaking", "creeper",
+                    "skeleton", "bogged", "stray", "phantom", "slime", "silverfish", "zombie", "husk"
             )),
             new CreatureCategory("pillagers", "&6Saqueadores", "pillager", List.of(
                     "evoker", "illusioner", "pillager", "ravager", "vex", "vindicator"
