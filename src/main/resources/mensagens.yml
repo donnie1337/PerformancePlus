@@ -28,15 +28,18 @@ comandos:
     chunks-sinalizados: "&7Chunks sinalizados: &f{valor}"
 
   chunk:
-    titulo: "&f--- &bChunk &f({x}, {z}) &f---"
-    mobs: "&7Mobs: &f{valor}"
-    entidades: "&7Entidades: &f{valor}"
-    itens: "&7Itens: &f{valor}"
-    xp: "&7XP: &f{valor}"
-    hoppers: "&7Hoppers: &f{valor}"
-    spawners: "&7Spawners: &f{valor}"
-    pistoes: "&7Pistões: &f{valor}"
-    observers: "&7Observers: &f{valor}"
+    titulo: "&8&m----------------------------------------"
+    cabecalho: "&b&lINFORMAÇÕES DA CHUNK &8• &f{x}&7, &f{z}"
+    mundo: "&8• &7Mundo: &f{mundo}"
+    mobs: "&8• &7Criaturas nesta chunk: &f{valor}"
+    entidades: "&8• &7Entidades totais: &f{valor}"
+    itens: "&8• &7Itens no chão: &f{valor}"
+    xp: "&8• &7Orbes de XP: &f{valor}"
+    hoppers: "&8• &7Funis: &f{valor}"
+    spawners: "&8• &7Spawners: &f{valor}"
+    pistoes: "&8• &7Pistões: &f{valor}"
+    observers: "&8• &7Observers: &f{valor}"
+    rodape: "&8&m----------------------------------------"
 
   farms:
     nenhum: "&aNenhum chunk de alta concentração detectado."
@@ -44,10 +47,10 @@ comandos:
     item: "&7• &f{valor}"
 
   ajuda:
-    status: "&f/pperf status &7- Status de performance"
-    chunk: "&f/pperf chunk &7- Limites e contadores do chunk atual"
-    farms: "&f/pperf farms &7- Chunks com alta concentração"
-    reload: "&f/pperf reload &7- Recarrega o config.yml e mensagens.yml"
+    status: "&f/limite status &7- Status de performance"
+    chunk: "&f/limite chunk &7- Limites e contadores do chunk atual"
+    farms: "&f/limite farms &7- Chunks com alta concentração"
+    reload: "&f/limite reload &7- Recarrega o config.yml e mensagens.yml"
 
 limites:
   entidades: "&cLimite de entidades deste chunk atingido."
