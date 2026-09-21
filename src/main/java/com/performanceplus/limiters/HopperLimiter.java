@@ -33,7 +33,7 @@ public class HopperLimiter implements Listener {
         if (player.hasPermission("performanceplus.bypass.hoppers") || !isEnabled(chunk, "hoppers")) return;
 
         int limit = getLimit(chunk, "hoppers", 8);
-        if (limit > 0 && countHopperBlocks(chunk) >= limit) {
+        if (limit > 0 && countHopperBlocksBeforePlacement(chunk, event.getBlock()) >= limit) {
             event.setCancelled(true);
             sendLimit(player, limit, "Funis");
         }
@@ -78,10 +78,14 @@ public class HopperLimiter implements Listener {
         return plugin.getConfigManager().getFixedLimit(chunk.getWorld(), key, fallback);
     }
 
-    private int countHopperBlocks(Chunk chunk) {
+    private int countHopperBlocksBeforePlacement(Chunk chunk, org.bukkit.block.Block pendingBlock) {
         int total = 0;
         for (BlockState state : chunk.getTileEntities()) {
-            if (state.getType() == Material.HOPPER) total++;
+            if (state.getType() != Material.HOPPER) continue;
+            if (state.getX() == pendingBlock.getX()
+                    && state.getY() == pendingBlock.getY()
+                    && state.getZ() == pendingBlock.getZ()) continue;
+            total++;
         }
         return total;
     }

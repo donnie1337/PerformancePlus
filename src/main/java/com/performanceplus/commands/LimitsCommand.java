@@ -124,7 +124,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             "carrinho-de-mina", "observers", "pistoes", "pistoes-ativacoes-por-segundo",
             "blocos-de-redstone", "lampadas-de-redstone", "tochas-de-redstone",
             "po-de-redstone", "repetidores", "sensores-de-sculk", "catalisadores-de-sculk",
-            "emissores-de-sculk", "pistoes-com-slime", "carrinho-com-dinamite"
+            "emissores-de-sculk", "sinalizadores", "pistoes-com-slime", "carrinho-com-dinamite"
     );
 
     private static final List<String> GENERATOR_KEYS = List.of(
@@ -439,6 +439,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             case "sensores-de-sculk" -> "Sensores de sculk";
             case "catalisadores-de-sculk" -> "Catalisadores de sculk";
             case "emissores-de-sculk" -> "Emissores de sculk";
+            case "sinalizadores" -> "Sinalizadores";
             case "pistoes-com-slime" -> "Pistões com slime";
             case "carrinho-com-dinamite" -> "Carrinho com dinamite";
             case "spawners" -> "Spawners";
@@ -530,6 +531,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             case "sensores-de-sculk" -> Material.SCULK_SENSOR;
             case "catalisadores-de-sculk" -> Material.SCULK_CATALYST;
             case "emissores-de-sculk" -> Material.SCULK_SHRIEKER;
+            case "sinalizadores" -> Material.BEACON;
             case "pistoes-com-slime" -> Material.STICKY_PISTON;
             case "carrinho-com-dinamite" -> Material.TNT_MINECART;
             case "spawners" -> Material.SPAWNER;

@@ -105,6 +105,9 @@ limites:
   emissores-de-sculk:
     habilitado: true
     valor: 12
+  sinalizadores:
+    habilitado: true
+    valor: 3
   pistoes-com-slime:
     habilitado: true
     valor: 20

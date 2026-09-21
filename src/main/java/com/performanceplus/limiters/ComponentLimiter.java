@@ -15,6 +15,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -36,7 +37,8 @@ public class ComponentLimiter implements Listener {
             Map.entry(Material.SCULK_SENSOR, "sensores-de-sculk"),
             Map.entry(Material.CALIBRATED_SCULK_SENSOR, "sensores-de-sculk"),
             Map.entry(Material.SCULK_CATALYST, "catalisadores-de-sculk"),
-            Map.entry(Material.SCULK_SHRIEKER, "emissores-de-sculk")
+            Map.entry(Material.SCULK_SHRIEKER, "emissores-de-sculk"),
+            Map.entry(Material.BEACON, "sinalizadores")
     );
 
     private static final Map<Material, EntityType> ENTITY_ITEMS = Map.of(
@@ -71,28 +73,46 @@ public class ComponentLimiter implements Listener {
         if (event.getPlayer().hasPermission("performanceplus.bypass.componentes") || !isEnabled(chunk, key)) return;
 
         int limit = limit(chunk, key);
-        if (limit > 0 && blockCount(chunk, key) >= limit) {
+        int existing = blockCountBeforePlacement(event, key);
+        if (limit > 0 && existing >= limit) {
             event.setCancelled(true);
             sendLimit(event.getPlayer(), limit, displayName(key));
         }
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void updateAfterPlace(BlockPlaceEvent event) {
         String key = BLOCK_LIMITS.get(event.getBlock().getType());
         if (key == null) return;
+
         String chunkKey = ChunkUtils.key(event.getBlock().getChunk());
+        if (event.isCancelled()) {
+            blockCounts.remove(chunkKey);
+            return;
+        }
+
         Map<String, Integer> counts = blockCounts.get(chunkKey);
         if (counts != null) counts.merge(key, 1, Integer::sum);
     }
 
-    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = false)
     public void updateAfterBreak(BlockBreakEvent event) {
         String key = BLOCK_LIMITS.get(event.getBlock().getType());
         if (key == null) return;
+
         String chunkKey = ChunkUtils.key(event.getBlock().getChunk());
+        if (event.isCancelled()) {
+            blockCounts.remove(chunkKey);
+            return;
+        }
+
         Map<String, Integer> counts = blockCounts.get(chunkKey);
         if (counts != null) counts.computeIfPresent(key, (ignored, count) -> Math.max(0, count - 1));
+    }
+
+    @EventHandler
+    public void onChunkUnload(ChunkUnloadEvent event) {
+        blockCounts.remove(ChunkUtils.key(event.getChunk()));
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -136,20 +156,28 @@ public class ComponentLimiter implements Listener {
         return plugin.getConfigManager().getFixedLimit(chunk.getWorld(), key, 0);
     }
 
-    private int blockCount(Chunk chunk, String key) {
+    private int blockCountBeforePlacement(BlockPlaceEvent event, String key) {
+        Chunk chunk = event.getBlock().getChunk();
         String chunkKey = ChunkUtils.key(chunk);
-        Map<String, Integer> counts = blockCounts.computeIfAbsent(chunkKey, ignored -> scan(chunk));
+        Map<String, Integer> counts = blockCounts.computeIfAbsent(chunkKey, ignored -> scan(chunk, event));
         return counts.getOrDefault(key, 0);
     }
 
-    private Map<String, Integer> scan(Chunk chunk) {
+    private Map<String, Integer> scan(Chunk chunk, BlockPlaceEvent pendingPlacement) {
         Map<String, Integer> counts = new HashMap<>();
+        Block pendingBlock = pendingPlacement.getBlock();
+        Material replacedMaterial = pendingPlacement.getBlockReplacedState().getType();
         int minY = chunk.getWorld().getMinHeight();
         int maxY = chunk.getWorld().getMaxHeight();
+
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 for (int y = minY; y < maxY; y++) {
-                    String key = BLOCK_LIMITS.get(chunk.getBlock(x, y, z).getType());
+                    Material material = chunk.getBlock(x, y, z).getType();
+                    if (x == pendingBlock.getX() && y == pendingBlock.getY() && z == pendingBlock.getZ()) {
+                        material = replacedMaterial;
+                    }
+                    String key = BLOCK_LIMITS.get(material);
                     if (key != null) counts.merge(key, 1, Integer::sum);
                 }
             }
@@ -190,6 +218,7 @@ public class ComponentLimiter implements Listener {
             case "sensores-de-sculk" -> "Sensores de sculk";
             case "catalisadores-de-sculk" -> "Catalisadores de sculk";
             case "emissores-de-sculk" -> "Emissores de sculk";
+            case "sinalizadores" -> "Sinalizadores";
             default -> key;
         };
     }
