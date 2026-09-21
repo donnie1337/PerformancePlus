@@ -47,7 +47,7 @@ public class EntityLimiter implements Listener {
         if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())
                 || !plugin.getConfigManager().isLimitEnabled("entidades")) return;
 
-        int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "entidades", 100);
+        int limit = plugin.getConfigManager().getFixedLimit(chunk.getWorld(), "entidades", 100);
         if (limit <= 0) return;
 
         Metrics metrics = plugin.getMetricsManager().get(chunk);

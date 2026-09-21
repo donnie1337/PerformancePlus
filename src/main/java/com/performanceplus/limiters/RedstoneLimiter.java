@@ -30,7 +30,7 @@ public class RedstoneLimiter implements Listener {
         if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())
                 || !plugin.getConfigManager().isLimitEnabled("redstone")) return;
 
-        int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "redstone", 25);
+        int limit = plugin.getConfigManager().getFixedLimit(chunk.getWorld(), "redstone", 25);
         if (limit <= 0) return;
 
         String key = ChunkUtils.key(chunk);

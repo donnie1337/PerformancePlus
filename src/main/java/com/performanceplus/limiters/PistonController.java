@@ -33,7 +33,7 @@ public class PistonController implements Listener {
         if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())
                 || !plugin.getConfigManager().isLimitEnabled("pistoes-ativacoes-por-segundo")) return;
 
-        int limit = plugin.getConfigManager().getLimit(chunk.getWorld(), "pistoes-ativacoes-por-segundo", 8);
+        int limit = plugin.getConfigManager().getFixedLimit(chunk.getWorld(), "pistoes-ativacoes-por-segundo", 8);
         if (limit <= 0) return;
 
         String key = com.performanceplus.util.ChunkUtils.key(chunk);
