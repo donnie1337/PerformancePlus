@@ -199,6 +199,12 @@ public class LimitsCommand implements CommandExecutor, Listener {
             28, 29, 30, 31, 32, 33, 34
     };
 
+    private static final int FIRST_CREATURE_PAGE_SIZE = 54;
+    private static final int OTHER_CREATURE_PAGE_SIZE = 36;
+    private static final int CREATURE_BACK_SLOT = 48;
+    private static final int CREATURE_PREVIOUS_SLOT = 49;
+    private static final int CREATURE_NEXT_SLOT = 50;
+
     private void openCreatureCategories(Player player) {
         String path = "criaturas";
         int size = guiInt(path, "tamanho", 45);
@@ -229,7 +235,9 @@ public class LimitsCommand implements CommandExecutor, Listener {
         page = Math.max(0, Math.min(page, maxPage));
 
         String path = "criatura-itens";
-        int size = guiInt(path, "tamanho", 45);
+        int size = page == 0
+                ? guiInt(path, "tamanho-primeira-pagina", FIRST_CREATURE_PAGE_SIZE)
+                : guiInt(path, "tamanho-outras-paginas", OTHER_CREATURE_PAGE_SIZE);
         String title = guiString(path, "titulo-" + category.key,
                 "&8&lLimites &8• " + category.title);
 
@@ -250,10 +258,14 @@ public class LimitsCommand implements CommandExecutor, Listener {
             inventory.setItem(slot, head);
         }
 
-        setNavigation(inventory, "criaturas-pagina", "voltar");
-        if (page > 0) setNavigation(inventory, "criaturas-pagina", "pagina-anterior");
-        else setNavigation(inventory, "criaturas-pagina", "voltar");
-        if (page < maxPage) setNavigation(inventory, "criaturas-pagina", "proxima-pagina");
+        if (page == 0) {
+            setNavigation(inventory, "criaturas-pagina", "voltar", CREATURE_BACK_SLOT);
+            if (page < maxPage) {
+                setNavigation(inventory, "criaturas-pagina", "proxima-pagina", CREATURE_NEXT_SLOT);
+            }
+        } else {
+            setNavigation(inventory, "criaturas-pagina", "pagina-anterior", CREATURE_PREVIOUS_SLOT);
+        }
 
         player.openInventory(inventory);
     }
@@ -328,9 +340,14 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private void setNavigation(Inventory inventory, String page, String key) {
+        setNavigation(inventory, page, key, -1);
+    }
+
+    private void setNavigation(Inventory inventory, String page, String key, int forcedSlot) {
         String specificPath = "navegacao." + page + "." + key;
         String path = gui(specificPath) != null ? specificPath : "navegacao." + key;
-        int slot = guiInt(path, "slot", key.equals("voltar") ? 36 : key.equals("pagina-anterior") ? 40 : 44);
+        int slot = forcedSlot >= 0 ? forcedSlot
+                : guiInt(path, "slot", key.equals("voltar") ? 36 : key.equals("pagina-anterior") ? 40 : 44);
         if (slot < 0 || slot >= inventory.getSize()) return;
         Material material = guiMaterial(path, "material", Material.ARROW);
         String title = guiString(path, "titulo", "&fVoltar");
@@ -469,17 +486,16 @@ public class LimitsCommand implements CommandExecutor, Listener {
             int page = extrairPagina(title);
             int maxPage = Math.max(0, (category.mobs.size() - 1) / HEAD_SLOTS.length);
 
-            if (slot == guiInt("navegacao.criaturas-pagina.voltar", "slot", 36)
-                    || slot == guiInt("navegacao.voltar", "slot", 49)) {
+            if (page == 0 && slot == CREATURE_BACK_SLOT) {
                 openCreatureCategories(player);
                 return;
             }
-            if (slot == guiInt("navegacao.criaturas-pagina.pagina-anterior", "slot", 40)) {
-                if (page > 0) openCreaturePage(player, category, page - 1);
+            if (page > 0 && slot == CREATURE_PREVIOUS_SLOT) {
+                openCreaturePage(player, category, page - 1);
                 return;
             }
-            if (slot == guiInt("navegacao.criaturas-pagina.proxima-pagina", "slot", 44)) {
-                if (page < maxPage) openCreaturePage(player, category, page + 1);
+            if (page < maxPage && slot == CREATURE_NEXT_SLOT) {
+                openCreaturePage(player, category, page + 1);
             }
             return;
         }
