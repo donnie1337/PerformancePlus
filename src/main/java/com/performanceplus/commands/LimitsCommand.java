@@ -202,7 +202,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private static final int FIRST_CREATURE_PAGE_SIZE = 54;
     private static final int OTHER_CREATURE_PAGE_SIZE = 36;
     private static final int CREATURE_BACK_SLOT = 48;
-    private static final int CREATURE_PREVIOUS_SLOT = 49;
+    private static final int CREATURE_PREVIOUS_SLOT = 31;
     private static final int CREATURE_NEXT_SLOT = 50;
 
     private void openCreatureCategories(Player player) {
