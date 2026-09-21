@@ -406,7 +406,7 @@ gui:
           - "&7Por chunk"
 
   criatura-itens:
-    tamanho-primeira-pagina: 54
+    tamanho-primeira-pagina: 45
     tamanho-outras-paginas: 36
     itens-por-pagina: 21
     padrao:
