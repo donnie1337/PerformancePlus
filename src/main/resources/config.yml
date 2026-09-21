@@ -133,7 +133,7 @@ farm:
 # Slots começam em 0.
 gui:
   principal:
-    titulo: "&8Limites"
+    titulo: "&8Limites do Servidor"
     tamanho: 27
     categorias:
       redstone:
@@ -151,7 +151,7 @@ gui:
         lore:
           - ""
           - "&7Animais e monstros do servidor."
-          - "&8Limites aplicados por proximidade."
+          - "&8Limites por proximidade e raio."
       geradores:
         slot: 14
         material: "SPAWNER"
@@ -166,28 +166,22 @@ gui:
         titulo: "&eDecorações"
         lore:
           - ""
-          - "&7Entidades, itens e orbes de XP."
-          - "&8Organize os limites do seu mundo."
+          - "&7Limite de entidades por chunk: &f{limite}"
+          - "&8Itens no chão e orbes de XP não possuem limite."
 
   paginas:
     redstone:
-      titulo: "&8Limites &8• &cRedstone"
+      titulo: "&7Limites &8• &7Redstone"
       tamanho-primeira-pagina: 54
       tamanho-pagina-unica: 45
       tamanho-outras-paginas: 36
     geradores:
-      titulo: "&8Limites &8• &5Geradores"
+      titulo: "&7Limites &8• &7Geradores"
       tamanho-primeira-pagina: 54
       tamanho-pagina-unica: 36
       tamanho-outras-paginas: 36
-    decoracoes:
-      titulo: "&8Limites &8• &eDecorações"
-      tamanho-primeira-pagina: 54
-      tamanho-pagina-unica: 45
-      tamanho-outras-paginas: 36
-
   criaturas:
-    titulo: "&8Limites &8• &aCriaturas"
+    titulo: "&7Limites &8• &7Criaturas &8• &7Página 1&8/&71"
     tamanho: 45
     categorias:
       animais-terrestres:
@@ -486,22 +480,16 @@ gui:
         material: "ARROW"
         titulo: "&cVoltar"
         lore:
-          - "&7Clique aqui para voltar a página anterior."
+          - ""
+          - "&7Clique aqui para voltar à página anterior."
       proxima-pagina:
         slot: 50
         material: "ARROW"
         titulo: "&aPróxima página"
         lore:
+          - ""
           - "&7Clique aqui para ir para a próxima página."
     geradores:
-      voltar:
-        slot: 22
-        material: "ARROW"
-        titulo: "&cVoltar"
-        lore:
-          - ""
-          - "&7Clique aqui para voltar ao menu principal."
-    decoracoes:
       voltar:
         slot: 22
         material: "ARROW"
