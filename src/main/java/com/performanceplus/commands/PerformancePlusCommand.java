@@ -61,10 +61,10 @@ public class PerformancePlusCommand implements CommandExecutor, TabCompleter {
         Chunk chunk = player.getLocation().getChunk();
         Metrics metrics = plugin.getMetricsManager().get(chunk);
         m.send(sender, "comandos.chunk.titulo");
-        m.send(sender, "comandos.chunk.cabecalho", Map.of(
+        m.send(sender, "comandos.chunk.cabecalho");
+        m.send(sender, "comandos.chunk.coordenadas", Map.of(
                 "{x}", String.valueOf(chunk.getX()),
                 "{z}", String.valueOf(chunk.getZ())));
-        m.send(sender, "comandos.chunk.mundo", Map.of("{mundo}", chunk.getWorld().getName()));
         m.send(sender, "comandos.chunk.mobs", Map.of("{valor}", String.valueOf(metrics.mobs())));
         m.send(sender, "comandos.chunk.entidades", Map.of("{valor}", String.valueOf(metrics.entities())));
         m.send(sender, "comandos.chunk.itens", Map.of("{valor}", String.valueOf(metrics.items())));
