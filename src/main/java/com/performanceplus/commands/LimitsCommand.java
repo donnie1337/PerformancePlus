@@ -151,8 +151,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private static final CreatureCategory[] CREATURE_CATEGORIES = {
             new CreatureCategory("animais-terrestres", "&aAnimais terrestres", "panda", List.of(
                     "bee", "allay", "donkey", "goat", "camel", "horse", "rabbit", "sniffer", "chicken",
-                    "cat", "ocelot", "llama", "wolf", "mooshroom", "bat", "mule", "sheep", "panda",
-                    "parrot", "pig", "fox", "frog", "armadillo", "polar_bear", "cow"
+                    "cat", "ocelot", "llama", "trader_llama", "wolf", "mooshroom", "bat", "mule",
+                    "sheep", "panda", "parrot", "pig", "fox", "frog", "armadillo", "polar_bear", "cow"
             )),
             new CreatureCategory("animais-aquaticos", "&bAnimais aquáticos", "axolotl", List.of(
                     "axolotl", "cod", "dolphin", "drowned", "elder_guardian", "glow_squid", "guardian",
@@ -168,8 +168,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
             new CreatureCategory("aldeoes-traders", "&eAldeões e Comerciantes", "villager", List.of(
                     "villager", "wandering_trader"
             )),
-            new CreatureCategory("cavalos-especiais", "&dCavalos especiais", "horse", List.of(
-                    "camel", "donkey", "horse", "llama", "mule", "skeleton_horse", "trader_llama", "zombie_horse"
+            new CreatureCategory("cavalos-especiais", "&dCavalos especiais", "skeleton_horse", List.of(
+                    "skeleton_horse", "zombie_horse"
             )),
             new CreatureCategory("golems", "&fGolems", "iron_golem", List.of(
                     "iron_golem", "snow_golem"
