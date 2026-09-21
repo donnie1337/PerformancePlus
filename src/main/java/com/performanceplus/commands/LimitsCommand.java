@@ -150,9 +150,9 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private static final CreatureCategory[] CREATURE_CATEGORIES = {
             new CreatureCategory("animais-terrestres", "&aAnimais terrestres", "panda", List.of(
-                    "cow", "sheep", "pig", "chicken", "rabbit", "fox", "wolf", "cat", "panda",
-                    "mooshroom", "goat", "polar_bear", "bee", "parrot", "allay", "sniffer",
-                    "armadillo", "bat", "ocelot"
+                    "bee", "allay", "donkey", "goat", "camel", "horse", "rabbit", "sniffer", "chicken",
+                    "cat", "ocelot", "llama", "wolf", "mooshroom", "bat", "mule", "sheep", "panda",
+                    "parrot", "pig", "fox", "frog", "armadillo", "polar_bear", "cow"
             )),
             new CreatureCategory("animais-aquaticos", "&bAnimais aquáticos", "axolotl", List.of(
                     "turtle", "dolphin", "squid", "glow_squid", "cod", "salmon",
