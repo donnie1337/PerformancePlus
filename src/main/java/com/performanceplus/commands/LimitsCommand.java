@@ -168,8 +168,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
             new CreatureCategory("aldeoes-traders", "&eAldeões e Comerciantes", "villager", List.of(
                     "villager", "wandering_trader"
             )),
-            new CreatureCategory("cavalos-especiais", "&dCavalos especiais", "skeleton_horse", List.of(
-                    "skeleton_horse", "zombie_horse"
+            new CreatureCategory("monstros-especiais", "&dMonstros especiais", "charged_creeper", List.of(
+                    "charged_creeper"
             )),
             new CreatureCategory("golems", "&fGolems", "iron_golem", List.of(
                     "iron_golem", "snow_golem"
@@ -359,7 +359,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private int currentLimit(Player player, String key) {
-        return plugin.getConfigManager().getLimit(player.getWorld(), key, 0);
+        String limitKey = key.equals("charged_creeper") ? "creeper" : key;
+        return plugin.getConfigManager().getLimit(player.getWorld(), limitKey, 0);
     }
 
     private Material materialForLimit(String key) {
@@ -414,7 +415,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             case "ender_dragon" -> "Dragão do End"; case "blaze" -> "Blaze"; case "ghast" -> "Ghast"; case "magma_cube" -> "Cubo de magma";
             case "piglin" -> "Piglin"; case "piglin_brute" -> "Piglin bruto"; case "zombified_piglin" -> "Piglin zumbificado";
             case "hoglin" -> "Hoglin"; case "zoglin" -> "Zoglin"; case "wither_skeleton" -> "Esqueleto wither";
-            case "strider" -> "Lavagante"; case "wither" -> "Wither"; default -> mob;
+            case "strider" -> "Lavagante"; case "charged_creeper" -> "Creeper eletrificado"; case "wither" -> "Wither"; default -> mob;
         };
     }
     private String color(String text) {
