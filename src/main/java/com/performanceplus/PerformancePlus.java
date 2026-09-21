@@ -20,10 +20,14 @@ import com.performanceplus.monitor.PerformanceMonitor;
 import com.performanceplus.util.MessageManager;
 import org.bukkit.Chunk;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandSendEvent;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class PerformancePlus extends JavaPlugin {
+public class PerformancePlus extends JavaPlugin implements Listener {
 
     private static PerformancePlus instance;
     private ConfigManager configManager;
@@ -67,6 +71,7 @@ public class PerformancePlus extends JavaPlugin {
 
     private void registerListeners() {
         PluginManager pm = getServer().getPluginManager();
+        pm.registerEvents(this, this);
         pm.registerEvents(metricsManager, this);
         pm.registerEvents(new MobLimiter(this), this);
         pm.registerEvents(new SpawnerLimiter(this), this);
@@ -99,6 +104,13 @@ public class PerformancePlus extends JavaPlugin {
             limitsCommand.setExecutor(limits);
             getServer().getPluginManager().registerEvents(limits, this);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onPlayerCommandSend(PlayerCommandSendEvent event) {
+        // Garante que os aliases públicos apareçam na lista de comandos do cliente.
+        event.getCommands().add("limites");
+        event.getCommands().add("limite");
     }
 
     public static PerformancePlus getInstance() { return instance; }

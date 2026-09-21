@@ -17,12 +17,16 @@ commands:
     description: Mostra os limites ativos do servidor
     aliases: [limite]
     usage: /limites
+    permission: performanceplus.limits.use
   limpeza:
     description: Remove imediatamente os itens jogados no chão
     usage: /limpeza
     permission: performanceplus.admin
 
 permissions:
+  performanceplus.limits.use:
+    description: Permite abrir o menu público de limites do servidor
+    default: true
   performanceplus.admin:
     description: Permite recarregar a configuração do PerformancePlus
     default: op
