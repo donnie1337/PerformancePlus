@@ -45,6 +45,11 @@ public class PerformancePlus extends JavaPlugin {
         performanceMonitor = new PerformanceMonitor(this);
 
         registerListeners();
+        for (org.bukkit.World world : getServer().getWorlds()) {
+            for (Chunk chunk : world.getLoadedChunks()) {
+                metricsManager.initializeLoadedChunk(chunk);
+            }
+        }
         registerCommands();
         itemCleanupManager.start();
         performanceMonitor.start();

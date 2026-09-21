@@ -11,8 +11,17 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.block.BlockFace;
+import org.bukkit.event.Cancellable;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockDispenseEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
+import org.bukkit.event.block.BlockPistonExtendEvent;
+import org.bukkit.event.block.BlockPistonRetractEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.vehicle.VehicleCreateEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
@@ -142,8 +151,66 @@ public class ComponentLimiter implements Listener {
         if (!isEnabled(chunk, key)) return;
 
         int limit = limit(chunk, key);
-        if (limit > 0 && entityCount(chunk, event.getVehicle().getType()) >= limit) {
+        if (limit > 0 && entityCount(chunk, event.getVehicle().getType(), event.getVehicle()) >= limit) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onDispense(BlockDispenseEvent event) {
+        EntityType type = ENTITY_ITEMS.get(event.getItem().getType());
+        if (type == null) return;
+
+        String key = ENTITY_LIMITS.get(type);
+        Chunk chunk = event.getBlock().getChunk();
+        if (!isEnabled(chunk, key)) return;
+
+        int limit = limit(chunk, key);
+        if (limit > 0 && entityCount(chunk, type) >= limit) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onArmorStandSpawn(EntitySpawnEvent event) {
+        if (event.getEntityType() != EntityType.ARMOR_STAND) return;
+
+        Chunk chunk = event.getLocation().getChunk();
+        String key = "suporte-armaduras";
+        if (!isEnabled(chunk, key)) return;
+
+        int limit = limit(chunk, key);
+        if (limit > 0 && entityCount(chunk, EntityType.ARMOR_STAND, event.getEntity()) >= limit) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPistonExtend(BlockPistonExtendEvent event) {
+        validatePistonMove(event.getBlocks(), event.getDirection(), event);
+        invalidateAfterPiston(event.getBlocks(), event.getDirection());
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onPistonRetract(BlockPistonRetractEvent event) {
+        validatePistonMove(event.getBlocks(), event.getDirection(), event);
+        invalidateAfterPiston(event.getBlocks(), event.getDirection());
+    }
+
+    @EventHandler
+    public void onBlockExplode(BlockExplodeEvent event) {
+        invalidate(event.blockList());
+    }
+
+    @EventHandler
+    public void onEntityExplode(EntityExplodeEvent event) {
+        invalidate(event.blockList());
+    }
+
+    @EventHandler
+    public void onBlockPhysics(BlockPhysicsEvent event) {
+        if (BLOCK_LIMITS.containsKey(event.getBlock().getType())) {
+            blockCounts.remove(ChunkUtils.key(event.getBlock().getChunk()));
         }
     }
 
@@ -164,9 +231,15 @@ public class ComponentLimiter implements Listener {
     }
 
     private Map<String, Integer> scan(Chunk chunk, BlockPlaceEvent pendingPlacement) {
+        return scan(chunk, pendingPlacement.getBlock(), pendingPlacement.getBlockReplacedState().getType());
+    }
+
+    private Map<String, Integer> scan(Chunk chunk) {
+        return scan(chunk, null, null);
+    }
+
+    private Map<String, Integer> scan(Chunk chunk, Block pendingBlock, Material replacedMaterial) {
         Map<String, Integer> counts = new HashMap<>();
-        Block pendingBlock = pendingPlacement.getBlock();
-        Material replacedMaterial = pendingPlacement.getBlockReplacedState().getType();
         int minY = chunk.getWorld().getMinHeight();
         int maxY = chunk.getWorld().getMaxHeight();
 
@@ -174,7 +247,10 @@ public class ComponentLimiter implements Listener {
             for (int z = 0; z < 16; z++) {
                 for (int y = minY; y < maxY; y++) {
                     Material material = chunk.getBlock(x, y, z).getType();
-                    if (x == pendingBlock.getX() && y == pendingBlock.getY() && z == pendingBlock.getZ()) {
+                    if (pendingBlock != null
+                            && x == pendingBlock.getX()
+                            && y == pendingBlock.getY()
+                            && z == pendingBlock.getZ()) {
                         material = replacedMaterial;
                     }
                     String key = BLOCK_LIMITS.get(material);
@@ -185,10 +261,63 @@ public class ComponentLimiter implements Listener {
         return counts;
     }
 
+    private void validatePistonMove(List<Block> blocks, BlockFace direction, Cancellable event) {
+        Map<String, Chunk> chunks = new HashMap<>();
+        Map<String, Map<String, Integer>> changes = new HashMap<>();
+
+        for (Block source : blocks) {
+            String key = BLOCK_LIMITS.get(source.getType());
+            if (key == null) continue;
+            addChange(chunks, changes, source.getChunk(), key, -1);
+            addChange(chunks, changes, source.getRelative(direction).getChunk(), key, 1);
+        }
+
+        for (Map.Entry<String, Map<String, Integer>> entry : changes.entrySet()) {
+            Chunk chunk = chunks.get(entry.getKey());
+            Map<String, Integer> current = scan(chunk);
+            for (Map.Entry<String, Integer> change : entry.getValue().entrySet()) {
+                if (change.getValue() <= 0 || !isEnabled(chunk, change.getKey())) continue;
+                int maximum = limit(chunk, change.getKey());
+                if (maximum > 0 && current.getOrDefault(change.getKey(), 0) + change.getValue() > maximum) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    private void addChange(Map<String, Chunk> chunks, Map<String, Map<String, Integer>> changes,
+                           Chunk chunk, String key, int value) {
+        String chunkKey = ChunkUtils.key(chunk);
+        chunks.putIfAbsent(chunkKey, chunk);
+        changes.computeIfAbsent(chunkKey, ignored -> new HashMap<>()).merge(key, value, Integer::sum);
+    }
+
+    private void invalidateAfterPiston(List<Block> blocks, BlockFace direction) {
+        Map<String, Chunk> affected = new HashMap<>();
+        for (Block block : blocks) {
+            affected.put(ChunkUtils.key(block.getChunk()), block.getChunk());
+            Block destination = block.getRelative(direction);
+            affected.put(ChunkUtils.key(destination.getChunk()), destination.getChunk());
+        }
+        plugin.getServer().getScheduler().runTask(plugin,
+                () -> affected.keySet().forEach(blockCounts::remove));
+    }
+
+    private void invalidate(List<Block> blocks) {
+        for (Block block : blocks) {
+            blockCounts.remove(ChunkUtils.key(block.getChunk()));
+        }
+    }
+
     private int entityCount(Chunk chunk, EntityType type) {
+        return entityCount(chunk, type, null);
+    }
+
+    private int entityCount(Chunk chunk, EntityType type, Entity ignoredEntity) {
         int total = 0;
         for (Entity entity : chunk.getEntities()) {
-            if (entity.getType() == type) total++;
+            if (entity != ignoredEntity && entity.getType() == type) total++;
         }
         return total;
     }

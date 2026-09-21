@@ -15,6 +15,7 @@ import java.util.Map;
 public class ItemCleanupManager {
     private final PerformancePlus plugin;
     private final List<BukkitTask> tasks = new ArrayList<>();
+    private BukkitTask countdownTask;
 
     public ItemCleanupManager(PerformancePlus plugin) {
         this.plugin = plugin;
@@ -38,6 +39,10 @@ public class ItemCleanupManager {
     public void stop() {
         tasks.forEach(BukkitTask::cancel);
         tasks.clear();
+        if (countdownTask != null) {
+            countdownTask.cancel();
+            countdownTask = null;
+        }
     }
 
     private void scheduleRepeating(String message, long delay, long interval, boolean countdown) {
@@ -52,14 +57,17 @@ public class ItemCleanupManager {
     }
 
     private void startCountdown() {
+        if (countdownTask != null) countdownTask.cancel();
+
         final int[] second = {4};
-        final BukkitTask[] task = new BukkitTask[1];
-        task[0] = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
+        countdownTask = Bukkit.getScheduler().runTaskTimer(plugin, () -> {
             broadcast("lixeiro.contagem", Map.of("{segundo}", second[0] + (second[0] == 1 ? " segundo" : " segundos")));
             playForEveryone(Sound.BLOCK_NOTE_BLOCK_HAT, 1.0f, 1.0f);
-            if (--second[0] == 0) task[0].cancel();
+            if (--second[0] == 0 && countdownTask != null) {
+                countdownTask.cancel();
+                countdownTask = null;
+            }
         }, 0L, 20L);
-        tasks.add(task[0]);
     }
 
     public int cleanNow() {

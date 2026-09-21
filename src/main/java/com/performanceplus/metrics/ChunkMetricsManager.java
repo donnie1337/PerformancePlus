@@ -170,6 +170,27 @@ public final class ChunkMetricsManager implements Listener {
         }
     }
 
+    /**
+     * Reconstrói blocos e entidades para chunks que já estavam carregadas
+     * quando o plugin foi ativado.
+     */
+    public void initializeLoadedChunk(Chunk chunk) {
+        initializeBlocks(chunk);
+
+        String key = ChunkUtils.key(chunk);
+        entityLocations.entrySet().removeIf(entry -> key.equals(entry.getValue()));
+        Metrics metrics = get(chunk);
+        metrics.entities = 0;
+        metrics.mobs = 0;
+        metrics.items = 0;
+        metrics.xpOrbs = 0;
+        metrics.hopperMinecarts = 0;
+
+        for (Entity entity : chunk.getEntities()) {
+            addEntity(metrics, entity, key);
+        }
+    }
+
     public void initializeBlocks(Chunk chunk) {
         if (plugin.getConfigManager().isWorldIgnored(chunk.getWorld())) return;
         Metrics m = get(chunk);
