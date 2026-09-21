@@ -199,8 +199,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
     };
 
     private static final int FIRST_CREATURE_PAGE_SIZE = 54;
+    private static final int SINGLE_CREATURE_PAGE_SIZE = 45;
     private static final int OTHER_CREATURE_PAGE_SIZE = 36;
     private static final int CREATURE_BACK_SLOT = 48;
+    private static final int SINGLE_CREATURE_BACK_SLOT = 40;
     private static final int CREATURE_PREVIOUS_SLOT = 31;
     private static final int CREATURE_NEXT_SLOT = 50;
 
@@ -234,8 +236,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
         page = Math.max(0, Math.min(page, maxPage));
 
         String path = "criatura-itens";
+        boolean hasNextPage = maxPage > 0;
         int size = page == 0
-                ? guiInt(path, "tamanho-primeira-pagina", FIRST_CREATURE_PAGE_SIZE)
+                ? guiInt(path, hasNextPage ? "tamanho-primeira-pagina" : "tamanho-pagina-unica",
+                        hasNextPage ? FIRST_CREATURE_PAGE_SIZE : SINGLE_CREATURE_PAGE_SIZE)
                 : guiInt(path, "tamanho-outras-paginas", OTHER_CREATURE_PAGE_SIZE);
         String title = guiString(path, "titulo-" + category.key,
                 "&8&lLimites &8• " + category.title);
@@ -258,7 +262,8 @@ public class LimitsCommand implements CommandExecutor, Listener {
         }
 
         if (page == 0) {
-            setNavigation(inventory, "criaturas-pagina", "voltar", CREATURE_BACK_SLOT);
+            setNavigation(inventory, "criaturas-pagina", "voltar",
+                    hasNextPage ? CREATURE_BACK_SLOT : SINGLE_CREATURE_BACK_SLOT);
             if (page < maxPage) {
                 setNavigation(inventory, "criaturas-pagina", "proxima-pagina", CREATURE_NEXT_SLOT);
             }
@@ -485,7 +490,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
             int page = extrairPagina(title);
             int maxPage = Math.max(0, (category.mobs.size() - 1) / HEAD_SLOTS.length);
 
-            if (page == 0 && slot == CREATURE_BACK_SLOT) {
+            if (page == 0 && slot == (maxPage > 0 ? CREATURE_BACK_SLOT : SINGLE_CREATURE_BACK_SLOT)) {
                 openCreatureCategories(player);
                 return;
             }
