@@ -143,22 +143,52 @@ public class LimitsCommand implements CommandExecutor, Listener {
         player.openInventory(inventory);
     }
 
-    private static final List<String> HOSTILE_MOBS = List.of(
-            "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime",
-            "phantom", "enderman", "silverfish", "endermite", "blaze", "ghast", "magma_cube",
-            "piglin", "piglin_brute", "zombified_piglin", "hoglin", "zoglin", "wither_skeleton",
-            "shulker", "guardian", "elder_guardian", "drowned", "husk", "stray", "bogged",
-            "pillager", "vindicator", "evoker", "illusioner", "ravager", "vex", "warden",
-            "wither", "ender_dragon", "breeze", "creaking", "zombie_villager"
-    );
+    private record CreatureCategory(String key, String title, Material icon, List<String> mobs) {}
 
-    private static final List<String> ANIMALS = List.of(
-            "cow", "sheep", "pig", "chicken", "horse", "donkey", "mule", "rabbit", "fox",
-            "wolf", "cat", "panda", "mooshroom", "goat", "polar_bear", "turtle", "dolphin",
-            "squid", "glow_squid", "cod", "salmon", "tropical_fish", "pufferfish", "axolotl",
-            "frog", "tadpole", "bat", "bee", "parrot", "allay", "sniffer", "armadillo",
-            "camel", "llama", "ocelot", "strider"
-    );
+    private static final CreatureCategory[] CREATURE_CATEGORIES = {
+            new CreatureCategory("animais-terrestres", "&aAnimais terrestres", Material.GRASS_BLOCK, List.of(
+                    "cow", "sheep", "pig", "chicken", "rabbit", "fox", "wolf", "cat", "panda",
+                    "mooshroom", "goat", "polar_bear", "bee", "parrot", "allay", "sniffer",
+                    "armadillo", "bat", "ocelot"
+            )),
+            new CreatureCategory("animais-aquaticos", "&bAnimais aquáticos", Material.WATER_BUCKET, List.of(
+                    "turtle", "dolphin", "squid", "glow_squid", "cod", "salmon",
+                    "tropical_fish", "pufferfish", "axolotl", "frog", "tadpole"
+            )),
+            new CreatureCategory("monstros", "&cMonstros", Material.ZOMBIE_HEAD, List.of(
+                    "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime",
+                    "phantom", "silverfish", "endermite", "guardian", "elder_guardian",
+                    "drowned", "husk", "stray", "bogged", "warden", "breeze", "creaking",
+                    "zombie_villager"
+            )),
+            new CreatureCategory("pillagers", "&6Pillagers", Material.CROSSBOW, List.of(
+                    "pillager", "vindicator", "evoker", "illusioner", "ravager", "vex"
+            )),
+            new CreatureCategory("aldeoes-traders", "&eAldeões e Traders", Material.EMERALD, List.of(
+                    "villager", "wandering_trader"
+            )),
+            new CreatureCategory("cavalos-especiais", "&dCavalos especiais", Material.SADDLE, List.of(
+                    "horse", "donkey", "mule", "skeleton_horse", "zombie_horse", "llama", "trader_llama", "camel"
+            )),
+            new CreatureCategory("golems", "&fGolems", Material.IRON_BLOCK, List.of(
+                    "iron_golem", "snow_golem"
+            )),
+            new CreatureCategory("end", "&5End", Material.ENDER_EYE, List.of(
+                    "enderman", "endermite", "shulker", "ender_dragon"
+            )),
+            new CreatureCategory("nether", "&4Nether", Material.NETHERRACK, List.of(
+                    "blaze", "ghast", "magma_cube", "piglin", "piglin_brute",
+                    "zombified_piglin", "hoglin", "zoglin", "wither_skeleton", "strider"
+            )),
+            new CreatureCategory("bosses", "&4Bosses", Material.NETHER_STAR, List.of(
+                    "wither", "ender_dragon", "elder_guardian", "warden"
+            ))
+    };
+
+    private static final int[] CATEGORY_SLOTS = {
+            10, 11, 12, 13, 14, 15, 16,
+            19, 20, 21
+    };
 
     private static final int[] HEAD_SLOTS = {
             10, 11, 12, 13, 14, 15, 16,
@@ -168,47 +198,55 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private void openCreatureCategories(Player player) {
         String path = "criaturas";
-        int size = guiInt(path, "tamanho", 27);
+        int size = guiInt(path, "tamanho", 45);
         String title = guiString(path, "titulo", "&8&lLimites &8• &aCriaturas");
         Inventory inventory = Bukkit.createInventory(null, size, color(title));
 
-        ItemStack criaturas = criarCabecaCombatePlus("skeleton", "&f&lCriaturas",
-                List.of("&7Clique para visualizar as criaturas hostis."));
-        ItemStack animais = criarCabecaCombatePlus("panda", "&a&lAnimais",
-                List.of("&7Clique para visualizar os animais."));
+        for (int i = 0; i < CREATURE_CATEGORIES.length; i++) {
+            CreatureCategory category = CREATURE_CATEGORIES[i];
+            int slot = guiInt(path + ".categorias." + category.key, "slot",
+                    CATEGORY_SLOTS[i]);
 
-        inventory.setItem(guiInt(path, "criaturas-slot", 11), criaturas);
-        inventory.setItem(guiInt(path, "animais-slot", 15), animais);
+            String itemPath = path + ".categorias." + category.key;
+            inventory.setItem(slot, createConfiguredItem(
+                    itemPath,
+                    category.icon,
+                    category.key,
+                    List.of("&7Clique para visualizar os limites."),
+                    -1,
+                    category.title
+            ));
+        }
 
         setNavigation(inventory, "criaturas-menu", "voltar");
         player.openInventory(inventory);
     }
 
-    private void openCreaturePage(Player player, boolean animais, int page) {
-        List<String> entries = animais ? ANIMALS : HOSTILE_MOBS;
-        String type = animais ? "animais" : "hostis";
+    private void openCreaturePage(Player player, CreatureCategory category, int page) {
+        List<String> entries = category.mobs;
         int perPage = HEAD_SLOTS.length;
         int maxPage = Math.max(0, (entries.size() - 1) / perPage);
         page = Math.max(0, Math.min(page, maxPage));
 
         String path = "criatura-itens";
         int size = guiInt(path, "tamanho", 45);
-        String title = guiString(path, animais ? "titulo-animais" : "titulo-criaturas",
-                animais ? "&8&lLimites &8• &aAnimais" : "&8&lLimites &8• &cMobs hostis");
+        String title = guiString(path, "titulo-" + category.key,
+                "&8&lLimites &8• " + category.title);
 
         Inventory inventory = Bukkit.createInventory(null, size,
                 color(title + " &8• &7" + (page + 1) + "/" + (maxPage + 1)));
 
-        int start = page * perPage;
-        int end = Math.min(start + perPage, entries.size());
+        int startIndex = page * perPage;
+        int endIndex = Math.min(startIndex + perPage, entries.size());
 
-        for (int i = start; i < end; i++) {
+        for (int i = startIndex; i < endIndex; i++) {
             String mob = entries.get(i);
-            int slot = HEAD_SLOTS[i - start];
-            ItemStack head = criarCabecaCombatePlus(mob, "&f&l" + formatMobName(mob),
-                    List.of(
-                            "&7Limite por chunk: &f" + currentLimit(player, mob)
-                    ));
+            int slot = HEAD_SLOTS[i - startIndex];
+            ItemStack head = criarCabecaCombatePlus(
+                    mob,
+                    "&f&l" + formatMobName(mob),
+                    List.of("&7Limite por chunk: &f" + currentLimit(player, mob))
+            );
             inventory.setItem(slot, head);
         }
 
@@ -219,6 +257,23 @@ public class LimitsCommand implements CommandExecutor, Listener {
         player.openInventory(inventory);
     }
 
+    private CreatureCategory findCreatureCategory(String key) {
+        for (CreatureCategory category : CREATURE_CATEGORIES) {
+            if (category.key.equals(key)) return category;
+        }
+        return null;
+    }
+
+    private CreatureCategory findCreatureCategoryByTitle(String title) {
+        if (title == null) return null;
+        for (CreatureCategory category : CREATURE_CATEGORIES) {
+            String base = color(guiString("criatura-itens", "titulo-" + category.key,
+                    "&8&lLimites &8• " + category.title));
+            if (title.startsWith(base)) return category;
+        }
+        return null;
+    }
+
     private ItemStack criarCabecaCombatePlus(String nome, String titulo, List<String> lore) {
         ItemStack item = null;
         try {
@@ -226,19 +281,17 @@ public class LimitsCommand implements CommandExecutor, Listener {
             if (combate != null) {
                 Object manager = combate.getClass().getMethod("getCabecasManager").invoke(combate);
                 if (manager != null) {
-                    Object resultado = manager.getClass().getMethod("criarCabecaPorNome", String.class).invoke(manager, nome);
-                    if (resultado instanceof ItemStack stack) {
-                        item = stack.clone();
-                    }
+                    Object resultado = manager.getClass()
+                            .getMethod("criarCabecaPorNome", String.class)
+                            .invoke(manager, nome);
+                    if (resultado instanceof ItemStack stack) item = stack.clone();
                 }
             }
         } catch (ReflectiveOperationException exception) {
             plugin.getLogger().warning("Não foi possível acessar o sistema de cabeças do CombatePlus.");
         }
 
-        if (item == null) {
-            item = new ItemStack(Material.PLAYER_HEAD);
-        }
+        if (item == null) item = new ItemStack(Material.PLAYER_HEAD);
 
         ItemMeta meta = item.getItemMeta();
         if (meta != null) {
@@ -340,9 +393,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private boolean isCreaturePageTitle(String title) {
-        if (title == null) return false;
-        return title.startsWith(color("&8&lLimites &8• &cMobs hostis"))
-                || title.startsWith(color("&8&lLimites &8• &aAnimais"));
+        return findCreatureCategoryByTitle(title) != null;
     }
 
     @EventHandler
@@ -373,26 +424,33 @@ public class LimitsCommand implements CommandExecutor, Listener {
         }
 
         if (isCategoryTitle(title)) {
-            if (slot == guiInt("criaturas", "criaturas-slot", 11)) {
-                openCreaturePage(player, false, 0);
-                return;
-            }
-            if (slot == guiInt("criaturas", "animais-slot", 15)) {
-                openCreaturePage(player, true, 0);
-                return;
-            }
             if (slot == guiInt("navegacao.criaturas-menu.voltar", "slot", 22)
                     || slot == guiInt("navegacao.voltar", "slot", 49)) {
                 openMain(player);
+                return;
+            }
+
+            for (int i = 0; i < CREATURE_CATEGORIES.length; i++) {
+                CreatureCategory category = CREATURE_CATEGORIES[i];
+                int categorySlot = guiInt(
+                        "criaturas.categorias." + category.key,
+                        "slot",
+                        CATEGORY_SLOTS[i]
+                );
+                if (slot == categorySlot) {
+                    openCreaturePage(player, category, 0);
+                    return;
+                }
             }
             return;
         }
 
         if (isCreaturePageTitle(title)) {
-            boolean animais = title.startsWith(color("&8&lLimites &8• &aAnimais"));
+            CreatureCategory category = findCreatureCategoryByTitle(title);
+            if (category == null) return;
+
             int page = extrairPagina(title);
-            List<String> entries = animais ? ANIMALS : HOSTILE_MOBS;
-            int maxPage = Math.max(0, (entries.size() - 1) / HEAD_SLOTS.length);
+            int maxPage = Math.max(0, (category.mobs.size() - 1) / HEAD_SLOTS.length);
 
             if (slot == guiInt("navegacao.criaturas-pagina.voltar", "slot", 40)
                     || slot == guiInt("navegacao.voltar", "slot", 49)) {
@@ -400,11 +458,11 @@ public class LimitsCommand implements CommandExecutor, Listener {
                 return;
             }
             if (slot == guiInt("navegacao.criaturas-pagina.pagina-anterior", "slot", 38)) {
-                openCreaturePage(player, animais, Math.max(0, page - 1));
+                if (page > 0) openCreaturePage(player, category, page - 1);
                 return;
             }
             if (slot == guiInt("navegacao.criaturas-pagina.proxima-pagina", "slot", 42)) {
-                if (page < maxPage) openCreaturePage(player, animais, page + 1);
+                if (page < maxPage) openCreaturePage(player, category, page + 1);
             }
             return;
         }
