@@ -227,19 +227,21 @@ public class ComponentLimiter implements Listener {
     private int blockCountBeforePlacement(BlockPlaceEvent event, String key) {
         Chunk chunk = event.getBlock().getChunk();
         String chunkKey = ChunkUtils.key(chunk);
-        Map<String, Integer> counts = blockCounts.computeIfAbsent(chunkKey, ignored -> scan(chunk, event));
+        Map<String, Integer> counts = blockCounts.get(chunkKey);
+
+        if (counts == null) {
+            // Durante o BlockPlaceEvent o bloco novo já está visível na chunk.
+            // Removemos somente esta tentativa da primeira leitura, deixando o
+            // cache com a quantidade que já existia antes dela.
+            counts = scan(chunk);
+            counts.computeIfPresent(key, (ignored, count) -> Math.max(0, count - 1));
+            blockCounts.put(chunkKey, counts);
+        }
+
         return counts.getOrDefault(key, 0);
     }
 
-    private Map<String, Integer> scan(Chunk chunk, BlockPlaceEvent pendingPlacement) {
-        return scan(chunk, pendingPlacement.getBlock(), pendingPlacement.getBlockReplacedState().getType());
-    }
-
     private Map<String, Integer> scan(Chunk chunk) {
-        return scan(chunk, null, null);
-    }
-
-    private Map<String, Integer> scan(Chunk chunk, Block pendingBlock, Material replacedMaterial) {
         Map<String, Integer> counts = new HashMap<>();
         int minY = chunk.getWorld().getMinHeight();
         int maxY = chunk.getWorld().getMaxHeight();
@@ -247,14 +249,7 @@ public class ComponentLimiter implements Listener {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
                 for (int y = minY; y < maxY; y++) {
-                    Material material = chunk.getBlock(x, y, z).getType();
-                    if (pendingBlock != null
-                            && x == pendingBlock.getX()
-                            && y == pendingBlock.getY()
-                            && z == pendingBlock.getZ()) {
-                        material = replacedMaterial;
-                    }
-                    String key = BLOCK_LIMITS.get(material);
+                    String key = BLOCK_LIMITS.get(chunk.getBlock(x, y, z).getType());
                     if (key != null) counts.merge(key, 1, Integer::sum);
                 }
             }
