@@ -12,9 +12,18 @@ mundos:
   ignorados: []
 
 limites:
+  # Criaturas são limitadas por proximidade, não por chunk.
+  # O mesmo limite é aplicado a animais, monstros, aldeões, golems e chefes.
   mobs:
     habilitado: true
     valor: 8
+    raio: 16
+    # Configure apenas as criaturas que precisarem de um valor diferente.
+    # Exemplo:
+    # criaturas:
+    #   cow:
+    #     valor: 12
+    #     raio: 20
 
   entidades:
     habilitado: true
