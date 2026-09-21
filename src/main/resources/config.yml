@@ -436,7 +436,7 @@ gui:
         titulo: "&fVoltar para Criaturas"
         lore: []
       pagina-anterior:
-        slot: 49
+        slot: 31
         material: "ARROW"
         titulo: "&fPágina anterior"
         lore: []
