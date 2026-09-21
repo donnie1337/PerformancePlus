@@ -406,7 +406,7 @@ gui:
           - "&7Por chunk"
 
   criatura-itens:
-    tamanho-primeira-pagina: 45
+    tamanho-primeira-pagina: 54
     tamanho-outras-paginas: 36
     itens-por-pagina: 21
     padrao:
@@ -431,7 +431,7 @@ gui:
         lore: []
     criaturas-pagina:
       voltar:
-        slot: 40
+        slot: 48
         material: "ARROW"
         titulo: "&fVoltar para Criaturas"
         lore: []
@@ -441,7 +441,7 @@ gui:
         titulo: "&fPágina anterior"
         lore: []
       proxima-pagina:
-        slot: 44
+        slot: 50
         material: "ARROW"
         titulo: "&fPróxima página"
         lore: []
