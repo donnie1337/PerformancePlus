@@ -6,6 +6,7 @@ author: donnie1337
 description: Sistema global de proteção, limites e desempenho para servidores Spigot/Bukkit.
 softdepend:
   - WorldPlus
+  - CombatePlus
 
 commands:
   performanceplus:
