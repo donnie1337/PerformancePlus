@@ -347,8 +347,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
                 color("&7  São &f256 blocos por camada."),
                 color("&7"),
                 color("&f• &7Criaturas usam limite por proximidade."),
-                color("&7  Funis, redstone e mecanismos usam chunk."),
-
+                color("&7  Funis, redstone e mecanismos usam chunk.")
         ));
         book.setItemMeta(meta);
         inventory.setItem(slot, book);
