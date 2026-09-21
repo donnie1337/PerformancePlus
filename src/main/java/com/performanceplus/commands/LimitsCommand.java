@@ -514,9 +514,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private int extrairPagina(String title) {
-        int separator = title.lastIndexOf(" • ");
+        String plainTitle = title.replaceAll("(?i)§[0-9a-fk-or]", "");
+        int separator = plainTitle.lastIndexOf(" • ");
         if (separator < 0) return 0;
-        String pagePart = title.substring(separator + 3);
+        String pagePart = plainTitle.substring(separator + 3);
         int slash = pagePart.indexOf('/');
         if (slash < 0) return 0;
         try {
