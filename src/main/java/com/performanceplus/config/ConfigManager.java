@@ -20,17 +20,50 @@ public class ConfigManager {
     public void reload() { plugin.reloadConfig(); }
 
     public int getLimit(World world, String key, int def) {
+        int value = getRawLimit(world, key, def);
+        // Hoppers e spawners permanecem fixos por chunk.
+        if ("hoppers".equalsIgnoreCase(key) || "spawners".equalsIgnoreCase(key)) return value;
+        return applyAdaptiveLimit(value);
+    }
+
+    /**
+     * Retorna o limite de uma criatura. Se não houver valor específico, usa
+     * o limite padrão de mobs definido em limites.mobs.valor.
+     */
+    public int getMobLimit(World world, String mobKey, int def) {
+        FileConfiguration cfg = raw();
+        String base = "limites.mobs.criaturas." + mobKey + ".valor";
+        String worldBase = "mundos." + world.getName() + ".limites.mobs.criaturas." + mobKey + ".valor";
+        int value = cfg.contains(worldBase) ? cfg.getInt(worldBase, def)
+                : (cfg.contains(base) ? cfg.getInt(base, def) : getRawLimit(world, "mobs", def));
+        return applyAdaptiveLimit(value);
+    }
+
+    /**
+     * Retorna o raio, em blocos, usado para contar a mesma criatura perto
+     * do ponto de nascimento.
+     */
+    public double getMobRadius(World world, String mobKey, double def) {
+        FileConfiguration cfg = raw();
+        String base = "limites.mobs.criaturas." + mobKey + ".raio";
+        String worldBase = "mundos." + world.getName() + ".limites.mobs.criaturas." + mobKey + ".raio";
+        String defaultPath = "limites.mobs.raio";
+        double radius = cfg.contains(worldBase) ? cfg.getDouble(worldBase, def)
+                : (cfg.contains(base) ? cfg.getDouble(base, def) : cfg.getDouble(defaultPath, def));
+        return Math.max(1.0, radius);
+    }
+
+    private int getRawLimit(World world, String key, int def) {
         String path = "limites." + key + ".valor";
         String worldPath = "mundos." + world.getName() + ".limites." + key;
         String worldValuePath = worldPath + ".valor";
         FileConfiguration cfg = raw();
-        int value = cfg.contains(worldValuePath) ? cfg.getInt(worldValuePath, def)
+        return cfg.contains(worldValuePath) ? cfg.getInt(worldValuePath, def)
                 : (cfg.contains(worldPath) ? cfg.getInt(worldPath, def) : cfg.getInt(path, def));
-        // O limite de hoppers é fixo: o valor configurado deve ser respeitado
-        // mesmo quando a proteção adaptativa estiver reduzindo outros limites.
-        // Assim, valor 20 significa sempre 20 hoppers por chunk.
-        if ("hoppers".equalsIgnoreCase(key) || "spawners".equalsIgnoreCase(key)) return value;
+    }
 
+    private int applyAdaptiveLimit(int value) {
+        FileConfiguration cfg = raw();
         if (value <= 0 || !cfg.getBoolean("performance.protecao-adaptativa.habilitado", true)
                 || plugin.getPerformanceMonitor() == null) return value;
         return Math.max(1, (int) Math.floor(value * plugin.getPerformanceMonitor().getLimitMultiplier()));
