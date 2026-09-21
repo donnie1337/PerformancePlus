@@ -9,12 +9,13 @@ softdepend:
   - CombatePlus
 
 commands:
-  limite:
-    description: Comando de diagnóstico e limites do PerformancePlus
-    aliases: [performanceplus, pperf, pp]
-    usage: /limite [status|chunk|farms|reload|help]
+  performanceplus:
+    description: Comando de diagnóstico do PerformancePlus
+    aliases: [pperf, pp]
+    usage: /performanceplus [status|chunk|farms|reload|help]
   limites:
     description: Mostra os limites ativos do servidor
+    aliases: [limite]
     usage: /limites
 
 permissions:
