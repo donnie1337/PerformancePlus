@@ -155,36 +155,35 @@ public class LimitsCommand implements CommandExecutor, Listener {
                     "parrot", "pig", "fox", "frog", "armadillo", "polar_bear", "cow"
             )),
             new CreatureCategory("animais-aquaticos", "&bAnimais aquáticos", "axolotl", List.of(
-                    "turtle", "dolphin", "squid", "glow_squid", "cod", "salmon",
-                    "tropical_fish", "pufferfish", "axolotl", "frog", "tadpole"
+                    "axolotl", "cod", "dolphin", "glow_squid", "pufferfish", "salmon", "squid",
+                    "tadpole", "tropical_fish", "turtle"
             )),
             new CreatureCategory("monstros", "&cMonstros", "zombie", List.of(
-                    "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime",
-                    "phantom", "silverfish", "endermite", "guardian", "elder_guardian",
-                    "drowned", "husk", "stray", "bogged", "warden", "breeze", "creaking",
-                    "zombie_villager"
+                    "bogged", "breeze", "cave_spider", "creaking", "creeper", "drowned", "elder_guardian",
+                    "endermite", "guardian", "husk", "phantom", "silverfish", "skeleton", "slime",
+                    "spider", "stray", "warden", "witch", "zombie", "zombie_villager"
             )),
             new CreatureCategory("pillagers", "&6Saqueadores", "pillager", List.of(
-                    "pillager", "vindicator", "evoker", "illusioner", "ravager", "vex"
+                    "evoker", "illusioner", "pillager", "ravager", "vex", "vindicator"
             )),
             new CreatureCategory("aldeoes-traders", "&eAldeões e Comerciantes", "villager", List.of(
                     "villager", "wandering_trader"
             )),
             new CreatureCategory("cavalos-especiais", "&dCavalos especiais", "horse", List.of(
-                    "horse", "donkey", "mule", "skeleton_horse", "zombie_horse", "llama", "trader_llama", "camel"
+                    "camel", "donkey", "horse", "llama", "mule", "skeleton_horse", "trader_llama", "zombie_horse"
             )),
             new CreatureCategory("golems", "&fGolems", "iron_golem", List.of(
                     "iron_golem", "snow_golem"
             )),
             new CreatureCategory("end", "&5End", "enderman", List.of(
-                    "enderman", "endermite", "shulker", "ender_dragon"
+                    "ender_dragon", "enderman", "endermite", "shulker"
             )),
             new CreatureCategory("nether", "&4Nether", "piglin", List.of(
-                    "blaze", "ghast", "magma_cube", "piglin", "piglin_brute",
-                    "zombified_piglin", "hoglin", "zoglin", "wither_skeleton", "strider"
+                    "blaze", "ghast", "hoglin", "magma_cube", "piglin", "piglin_brute",
+                    "strider", "wither_skeleton", "zoglin", "zombified_piglin"
             )),
             new CreatureCategory("bosses", "&4Chefes", "wither", List.of(
-                    "wither", "ender_dragon", "elder_guardian", "warden"
+                    "elder_guardian", "ender_dragon", "warden", "wither"
             ))
     };
 
