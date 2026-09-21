@@ -431,7 +431,11 @@ public class LimitsCommand implements CommandExecutor, Listener {
         }
     }
 
-    private boolean isLimitPageTitle(String title, String page) {\n        return color(guiString("paginas." + page, "titulo", "&8&lLimites")).equals(title);\n    }\n\n    private boolean isLimitsInventory(String title) {
+    private boolean isLimitPageTitle(String title, String page) {
+        return color(guiString("paginas." + page, "titulo", "&8&lLimites")).equals(title);
+    }
+
+    private boolean isLimitsInventory(String title) {
         if (title == null) return false;
         return isMainTitle(title) || isCategoryTitle(title)
                 || isLimitPageTitle(title, "redstone")
@@ -442,9 +446,4 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
     private record Category(String key, Material material) {}
 
-    private record CreatureCategory(String key, List<String> mobs) {
-        CreatureCategory(String key, String... mobs) {
-            this(key, List.of(mobs));
-        }
-    }
 }
