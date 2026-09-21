@@ -431,7 +431,7 @@ gui:
         lore: []
     criaturas-pagina:
       voltar:
-        slot: 48
+        slot: 40
         material: "ARROW"
         titulo: "&fVoltar para Criaturas"
         lore: []
@@ -441,7 +441,7 @@ gui:
         titulo: "&fPágina anterior"
         lore: []
       proxima-pagina:
-        slot: 50
+        slot: 44
         material: "ARROW"
         titulo: "&fPróxima página"
         lore: []
