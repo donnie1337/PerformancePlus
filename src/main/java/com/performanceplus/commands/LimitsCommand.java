@@ -143,51 +143,51 @@ public class LimitsCommand implements CommandExecutor, Listener {
         player.openInventory(inventory);
     }
 
-    private record CreatureCategory(String key, String title, Material icon, List<String> mobs) {}
+    private record CreatureCategory(String key, String title, String headMob, List<String> mobs) {}
 
     private static final CreatureCategory[] CREATURE_CATEGORIES = {
-            new CreatureCategory("animais-terrestres", "&aAnimais terrestres", Material.GRASS_BLOCK, List.of(
+            new CreatureCategory("animais-terrestres", "&aAnimais terrestres", "panda", List.of(
                     "cow", "sheep", "pig", "chicken", "rabbit", "fox", "wolf", "cat", "panda",
                     "mooshroom", "goat", "polar_bear", "bee", "parrot", "allay", "sniffer",
                     "armadillo", "bat", "ocelot"
             )),
-            new CreatureCategory("animais-aquaticos", "&bAnimais aquáticos", Material.WATER_BUCKET, List.of(
+            new CreatureCategory("animais-aquaticos", "&bAnimais aquáticos", "axolotl", List.of(
                     "turtle", "dolphin", "squid", "glow_squid", "cod", "salmon",
                     "tropical_fish", "pufferfish", "axolotl", "frog", "tadpole"
             )),
-            new CreatureCategory("monstros", "&cMonstros", Material.ZOMBIE_HEAD, List.of(
+            new CreatureCategory("monstros", "&cMonstros", "zombie", List.of(
                     "zombie", "skeleton", "creeper", "spider", "cave_spider", "witch", "slime",
                     "phantom", "silverfish", "endermite", "guardian", "elder_guardian",
                     "drowned", "husk", "stray", "bogged", "warden", "breeze", "creaking",
                     "zombie_villager"
             )),
-            new CreatureCategory("pillagers", "&6Pillagers", Material.CROSSBOW, List.of(
+            new CreatureCategory("pillagers", "&6Saqueadores", "pillager", List.of(
                     "pillager", "vindicator", "evoker", "illusioner", "ravager", "vex"
             )),
-            new CreatureCategory("aldeoes-traders", "&eAldeões e Traders", Material.EMERALD, List.of(
+            new CreatureCategory("aldeoes-traders", "&eAldeões e Comerciantes", "villager", List.of(
                     "villager", "wandering_trader"
             )),
-            new CreatureCategory("cavalos-especiais", "&dCavalos especiais", Material.SADDLE, List.of(
+            new CreatureCategory("cavalos-especiais", "&dCavalos especiais", "horse", List.of(
                     "horse", "donkey", "mule", "skeleton_horse", "zombie_horse", "llama", "trader_llama", "camel"
             )),
-            new CreatureCategory("golems", "&fGolems", Material.IRON_BLOCK, List.of(
+            new CreatureCategory("golems", "&fGolems", "iron_golem", List.of(
                     "iron_golem", "snow_golem"
             )),
-            new CreatureCategory("end", "&5End", Material.ENDER_EYE, List.of(
+            new CreatureCategory("end", "&5End", "enderman", List.of(
                     "enderman", "endermite", "shulker", "ender_dragon"
             )),
-            new CreatureCategory("nether", "&4Nether", Material.NETHERRACK, List.of(
+            new CreatureCategory("nether", "&4Nether", "piglin", List.of(
                     "blaze", "ghast", "magma_cube", "piglin", "piglin_brute",
                     "zombified_piglin", "hoglin", "zoglin", "wither_skeleton", "strider"
             )),
-            new CreatureCategory("bosses", "&4Bosses", Material.NETHER_STAR, List.of(
+            new CreatureCategory("bosses", "&4Chefes", "wither", List.of(
                     "wither", "ender_dragon", "elder_guardian", "warden"
             ))
     };
 
     private static final int[] CATEGORY_SLOTS = {
-            10, 11, 12, 13, 14, 15, 16,
-            19, 20, 21
+            10, 11, 12, 13, 14,
+            19, 20, 21, 22, 23
     };
 
     private static final int[] HEAD_SLOTS = {
@@ -208,13 +208,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
                     CATEGORY_SLOTS[i]);
 
             String itemPath = path + ".categorias." + category.key;
-            inventory.setItem(slot, createConfiguredItem(
-                    itemPath,
-                    category.icon,
-                    category.key,
-                    List.of("&7Clique para visualizar os limites."),
-                    -1,
-                    category.title
+            inventory.setItem(slot, criarCabecaCombatePlus(
+                    category.headMob,
+                    category.title,
+                    List.of("&7Clique para visualizar os limites.")
             ));
         }
 
@@ -252,6 +249,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
 
         setNavigation(inventory, "criaturas-pagina", "voltar");
         if (page > 0) setNavigation(inventory, "criaturas-pagina", "pagina-anterior");
+        else setNavigation(inventory, "criaturas-pagina", "voltar");
         if (page < maxPage) setNavigation(inventory, "criaturas-pagina", "proxima-pagina");
 
         player.openInventory(inventory);
@@ -329,7 +327,7 @@ public class LimitsCommand implements CommandExecutor, Listener {
     private void setNavigation(Inventory inventory, String page, String key) {
         String specificPath = "navegacao." + page + "." + key;
         String path = gui(specificPath) != null ? specificPath : "navegacao." + key;
-        int slot = guiInt(path, "slot", key.equals("voltar") ? (inventory.getSize() - 5) : key.equals("pagina-anterior") ? 38 : 42);
+        int slot = guiInt(path, "slot", key.equals("voltar") ? 36 : key.equals("pagina-anterior") ? 40 : 44);
         if (slot < 0 || slot >= inventory.getSize()) return;
         Material material = guiMaterial(path, "material", Material.ARROW);
         String title = guiString(path, "titulo", "&fVoltar");
@@ -371,15 +369,31 @@ public class LimitsCommand implements CommandExecutor, Listener {
     }
 
     private String formatMobName(String mob) {
-        String[] parts = mob.split("_");
-        StringBuilder result = new StringBuilder();
-        for (String part : parts) {
-            if (!result.isEmpty()) result.append(' ');
-            result.append(Character.toUpperCase(part.charAt(0))).append(part.substring(1));
-        }
-        return result.toString();
+        return switch (mob) {
+            case "cow" -> "Vaca"; case "sheep" -> "Ovelha"; case "pig" -> "Porco"; case "chicken" -> "Galinha";
+            case "rabbit" -> "Coelho"; case "fox" -> "Raposa"; case "wolf" -> "Lobo"; case "cat" -> "Gato";
+            case "panda" -> "Panda"; case "mooshroom" -> "Coguvaca"; case "goat" -> "Cabra"; case "polar_bear" -> "Urso-polar";
+            case "bee" -> "Abelha"; case "parrot" -> "Papagaio"; case "allay" -> "Allay"; case "sniffer" -> "Farejador";
+            case "armadillo" -> "Tatu"; case "bat" -> "Morcego"; case "ocelot" -> "Jaguatirica";
+            case "turtle" -> "Tartaruga"; case "dolphin" -> "Golfinho"; case "squid" -> "Lula"; case "glow_squid" -> "Lula brilhante";
+            case "cod" -> "Bacalhau"; case "salmon" -> "Salmão"; case "tropical_fish" -> "Peixe tropical"; case "pufferfish" -> "Baiacu";
+            case "axolotl" -> "Axolote"; case "frog" -> "Sapo"; case "tadpole" -> "Girino";
+            case "zombie" -> "Zumbi"; case "skeleton" -> "Esqueleto"; case "creeper" -> "Creeper"; case "spider" -> "Aranha";
+            case "cave_spider" -> "Aranha das cavernas"; case "witch" -> "Bruxa"; case "slime" -> "Slime"; case "phantom" -> "Fantasma";
+            case "silverfish" -> "Traça"; case "endermite" -> "Endermite"; case "guardian" -> "Guardião"; case "elder_guardian" -> "Guardião ancião";
+            case "drowned" -> "Afogado"; case "husk" -> "Zumbi-múmia"; case "stray" -> "Esqueleto glacial"; case "bogged" -> "Esqueleto do pântano";
+            case "warden" -> "Warden"; case "breeze" -> "Brisa"; case "creaking" -> "Creaking"; case "zombie_villager" -> "Aldeão zumbi";
+            case "pillager" -> "Saqueador"; case "vindicator" -> "Vingador"; case "evoker" -> "Invocador"; case "illusioner" -> "Ilusionista";
+            case "ravager" -> "Devastador"; case "vex" -> "Vex"; case "villager" -> "Aldeão"; case "wandering_trader" -> "Comerciante ambulante";
+            case "horse" -> "Cavalo"; case "donkey" -> "Burro"; case "mule" -> "Mula"; case "skeleton_horse" -> "Cavalo esqueleto";
+            case "zombie_horse" -> "Cavalo zumbi"; case "llama" -> "Lhama"; case "trader_llama" -> "Lhama do comerciante"; case "camel" -> "Camelo";
+            case "iron_golem" -> "Golem de ferro"; case "snow_golem" -> "Golem de neve"; case "enderman" -> "Enderman"; case "shulker" -> "Shulker";
+            case "ender_dragon" -> "Dragão do End"; case "blaze" -> "Blaze"; case "ghast" -> "Ghast"; case "magma_cube" -> "Cubo de magma";
+            case "piglin" -> "Piglin"; case "piglin_brute" -> "Piglin bruto"; case "zombified_piglin" -> "Piglin zumbificado";
+            case "hoglin" -> "Hoglin"; case "zoglin" -> "Zoglin"; case "wither_skeleton" -> "Esqueleto wither";
+            case "strider" -> "Lavagante"; case "wither" -> "Wither"; default -> mob;
+        };
     }
-
     private String color(String text) {
         return text.replace('&', '§');
     }
@@ -452,16 +466,16 @@ public class LimitsCommand implements CommandExecutor, Listener {
             int page = extrairPagina(title);
             int maxPage = Math.max(0, (category.mobs.size() - 1) / HEAD_SLOTS.length);
 
-            if (slot == guiInt("navegacao.criaturas-pagina.voltar", "slot", 40)
+            if (slot == guiInt("navegacao.criaturas-pagina.voltar", "slot", 36)
                     || slot == guiInt("navegacao.voltar", "slot", 49)) {
                 openCreatureCategories(player);
                 return;
             }
-            if (slot == guiInt("navegacao.criaturas-pagina.pagina-anterior", "slot", 38)) {
+            if (slot == guiInt("navegacao.criaturas-pagina.pagina-anterior", "slot", 40)) {
                 if (page > 0) openCreaturePage(player, category, page - 1);
                 return;
             }
-            if (slot == guiInt("navegacao.criaturas-pagina.proxima-pagina", "slot", 42)) {
+            if (slot == guiInt("navegacao.criaturas-pagina.proxima-pagina", "slot", 44)) {
                 if (page < maxPage) openCreaturePage(player, category, page + 1);
             }
             return;
