@@ -136,8 +136,8 @@ farm:
 # Slots começam em 0.
 gui:
   principal:
-    titulo: "&8Limites do Servidor"
-    tamanho: 27
+    titulo: "&8Limites do servidor"
+    tamanho: 36
     categorias:
       redstone:
         slot: 10
@@ -146,7 +146,9 @@ gui:
         lore:
           - ""
           - "&7Circuitos, mecanismos e componentes."
-          - "&8Limites aplicados por chunk."
+          - "&7Consulte os limites por chunk."
+          - ""
+          - "&eClique para visualizar"
       criaturas:
         slot: 12
         material: "ZOMBIE_HEAD"
@@ -154,7 +156,9 @@ gui:
         lore:
           - ""
           - "&7Animais e monstros do servidor."
-          - "&8Limites por proximidade e raio."
+          - "&7Limites por proximidade e raio."
+          - ""
+          - "&eClique para visualizar"
       geradores:
         slot: 14
         material: "SPAWNER"
@@ -162,15 +166,26 @@ gui:
         lore:
           - ""
           - "&7Spawners e geração de novos chunks."
-          - "&8Limites configurados para proteção."
+          - "&7Consulte os limites de proteção."
+          - ""
+          - "&eClique para visualizar"
       decoracoes:
         slot: 16
         material: "ARMOR_STAND"
         titulo: "&eDecorações"
         lore:
           - ""
-          - "&7Limite de entidades por chunk: &f{limite}"
+          - "&7Entidades decorativas do servidor."
+          - ""
+          - "&7Limite por chunk: &f{limite}"
           - "&8Itens no chão e orbes de XP não possuem limite."
+      voltar:
+        slot: 31
+        material: "ARROW"
+        titulo: "&cVoltar"
+        lore:
+          - ""
+          - "&7Clique para voltar às configurações."
 
   paginas:
     redstone:
