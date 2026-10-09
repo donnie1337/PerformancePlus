@@ -95,13 +95,42 @@ public class LimitsCommand implements CommandExecutor, Listener {
             if (slot < 0 || slot >= size) continue;
             ItemStack icon = category.key.equals("criaturas")
                     ? criarCabecaCombatePlus("zombie", guiString(path, "titulo", "&aCriaturas"),
-                            guiLore(path, "lore", List.of("", "&7Animais e monstros do servidor.", "&8Limites por proximidade e raio.")))
+                            guiLore(path, "lore", List.of(
+                                    "",
+                                    "&7Animais e monstros do servidor.",
+                                    "&7Limites por proximidade e raio.",
+                                    "",
+                                    "&eClique para visualizar"
+                            )))
                     : createConfiguredItem(path, category.material, category.key,
                             category.key.equals("decoracoes")
-                                    ? List.of("", "&7Limite de entidades por chunk: &f{limite}", "&8Itens no chão e orbes de XP não possuem limite.")
-                                    : List.of("&7Clique para visualizar os limites."),
+                                    ? List.of(
+                                            "",
+                                            "&7Entidades decorativas do servidor.",
+                                            "",
+                                            "&7Limite por chunk: &f{limite}",
+                                            "&8Itens no chão e orbes de XP não possuem limite."
+                                    )
+                                    : List.of(
+                                            "",
+                                            "&7Consulte os limites desta categoria.",
+                                            "",
+                                            "&eClique para visualizar"
+                                    ),
                             category.key.equals("decoracoes") ? currentLimit(player, "entidades") : -1);
             inventory.setItem(slot, icon);
+        }
+
+        int backSlot = guiInt("principal.voltar", "slot", 31);
+        if (backSlot >= 0 && backSlot < size) {
+            inventory.setItem(backSlot, createConfiguredItem(
+                    "principal.voltar",
+                    Material.ARROW,
+                    "voltar",
+                    List.of("", "&7Clique para voltar às configurações."),
+                    -1,
+                    "&cVoltar"
+            ));
         }
 
         player.openInventory(inventory);
@@ -616,6 +645,10 @@ public class LimitsCommand implements CommandExecutor, Listener {
         if (slot < 0 || slot >= event.getView().getTopInventory().getSize()) return;
 
         if (isMainTitle(title)) {
+            if (slot == guiInt("principal.voltar", "slot", 31)) {
+                player.performCommand("configurar");
+                return;
+            }
             for (Category category : CATEGORIES) {
                 String path = "principal.categorias." + category.key;
                 if (slot == guiInt(path, "slot", -1)) {
