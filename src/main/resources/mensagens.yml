@@ -61,10 +61,10 @@ limites:
   componente: "&cVocê atingiu o limite de &f{limite} &cpara &f{item} &cnesta chunk."
 
 lixeiro:
-  cinco-minutos: "&b&lᴘʀᴇꜰᴇɪᴛᴜʀᴀ &8• &7O caminhão de lixo irá passar daqui 5 minutos."
-  um-minuto: "&b&lᴘʀᴇꜰᴇɪᴛᴜʀᴀ &8• &7O caminhão de lixo irá passar daqui 1 minuto."
-  contagem: "&b&lᴘʀᴇꜰᴇɪᴛᴜʀᴀ &8• &7O chão será limpo em &f{segundo}&7."
-  limpo: "&b&lᴘʀᴇꜰᴇɪᴛᴜʀᴀ &8• &7O &clixeiro &7passou recolhendo &f{valor} &7itens que estavam jogados no chão!"
+  cinco-minutos: "&b[Prefeitura] &7O caminhão de lixo irá passar daqui 5 minutos."
+  um-minuto: "&b[Prefeitura] &7O caminhão de lixo irá passar daqui 1 minuto."
+  contagem: "&b[Prefeitura] &7O chão será limpo em &f{segundo}&7."
+  limpo: "&b[Prefeitura] &7O &clixeiro &7passou recolhendo &f{valor} &7itens que estavam jogados no chão!"
 
 farm:
   staff: "&eChunk com alta concentração de recursos: &f{mundo} {x},{z} &7(pontuação {score})."
